@@ -1,0 +1,717 @@
+# Requirements:
+# You are running as root.
+# You have dnscache, dnslog, tinydns, pickdns, walldns, and axfrdns accounts.
+# You have local IP addresses 127.43.0.{1,2,3,4,5}.
+#
+# Some features not tested here:
+# dns_random works.
+# random-ip works.
+# dnstrace works.
+# dns_resolvconfrewrite rereads after 10 minutes or 10000 uses.
+# dns_resolvconfip rereads after 10 minutes or 10000 uses.
+# /etc/resolv.conf is parsed properly.
+# dns_transmit handles timeouts properly.
+# dns_transmit falls back to TCP properly.
+# dns_transmit handles various strange situations: e.g., NOTIMP.
+
+
+umask 022
+
+rm -rf rts-tmp
+service=`pwd`/rts-tmp/service
+
+mkdir rts-tmp
+mkdir $service
+
+echo '
+*.b:.2.3.4
+=localhost:localhost.
+-.localhost:localhost.
+?:+.yp.to+.cr.yp.to+.whatever.cr.yp.to
+*.:
+' > rts-tmp/rewrite
+
+DNSREWRITEFILE=rts-tmp/rewrite; export DNSREWRITEFILE
+DNSCACHEIP=127.555.0.1; export DNSCACHEIP
+
+
+echo '--- dnscache-conf works'
+dnscache-conf dnscache dnslog $service/dnscache 127.555.0.1
+echo 127.555.0.2 > $service/dnscache/root/servers/tEST
+echo 127.555.0.4 > $service/dnscache/root/servers/43.127.iN-aDDR.aRPA
+supervise $service/dnscache | supervise $service/dnscache/log &
+
+echo '--- tinydns-conf works'
+tinydns-conf tinydns dnslog $service/tinydns 127.555.0.2
+supervise $service/tinydns | supervise $service/tinydns/log &
+
+echo '--- pickdns-conf works'
+pickdns-conf pickdns dnslog $service/pickdns 127.555.0.3
+supervise $service/pickdns | supervise $service/pickdns/log &
+
+echo '--- walldns-conf works'
+walldns-conf walldns dnslog $service/walldns 127.555.0.4
+supervise $service/walldns | supervise $service/walldns/log &
+
+echo '--- rbldns-conf works'
+rbldns-conf rbldns dnslog $service/rbldns 127.555.0.5 RbL.TeSt
+supervise $service/rbldns | supervise $service/rbldns/log &
+
+echo '--- axfrdns-conf works'
+axfrdns-conf axfrdns dnslog $service/axfrdns $service/tinydns 127.555.0.2
+supervise $service/axfrdns | supervise $service/axfrdns/log &
+
+sleep 1
+
+
+echo '--- cache handles simple example'
+cachetest \
+one two three four five \
+one:un one two three four five \
+two:deux one two three four five \
+three:trois one two three four five \
+four:quatre one two three four five \
+five:cinq one two three four five \
+one:een one two three four five \
+two:twee one two three four five \
+three:drie one two three four five \
+four:vier one two three four five \
+five:vijf one two three four five
+echo $?
+
+echo '--- cache handles overwriting'
+cachetest \
+one two three four five \
+one:un one two three four five \
+one:een one two three four five \
+two:deux one two three four five \
+two:twee one two three four five \
+three:trois one two three four five \
+three:drie one two three four five \
+four:quatre one two three four five \
+four:vier one two three four five \
+five:cinq one two three four five \
+five:vijf one two three four five
+echo $?
+
+echo '--- cache handles long chains'
+cachetest \
+a:1 a \
+a:2 a \
+a:3 a \
+a:4 a \
+a:5 a \
+a:6 a \
+a:7 a \
+a:8 a \
+a:9 a
+echo $?
+
+
+echo '--- dnsip finds IP address of network-surveys.cr.yp.to'
+dnsip network-surveys.cr.yp.to
+echo $?
+
+echo '--- dnsip does not find nonexistent.cr.yp.to'
+dnsip nonexistent.cr.yp.to
+echo $?
+
+echo '--- dnsip rejects overly long domain names'
+dnsip x.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789
+echo $?
+
+echo '--- dnsip handles IP address on input'
+dnsip 1.2.3.4 127.0.0.1 10.555.678.901 '[010.0555.0678.0901]'
+echo $?
+
+echo '--- dnsip allows 0 to be omitted'
+dnsip 127...1
+echo $?
+
+echo '--- dnsip handles multiple IP addresses on input'
+dnsip 1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16
+echo $?
+
+echo '--- dnsipq handles simple examples'
+dnsipq 1.b localhost anything.localhost 5.6.7.8 network-surveys nonexistent
+echo $?
+
+echo '--- dnsmx finds MX record for network-surveys.cr.yp.to'
+dnsmx network-surveys.cr.yp.to
+echo $?
+
+echo '--- dnsmx manufactures MX record for nonexistent.cr.yp.to'
+dnsmx nonexistent.cr.yp.to
+echo $?
+
+echo '--- dnsmx rejects overly long domain names'
+dnsmx 0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789
+echo $?
+
+echo '--- dnstxt finds TXT record for leap.yp.to'
+dnstxt leap.yp.to
+echo $?
+
+echo '--- dnstxt does not find nonexistent.cr.yp.to'
+dnstxt nonexistent.cr.yp.to
+echo $?
+
+echo '--- dnstxt rejects overly long domain names'
+dnstxt 0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789
+echo $?
+
+echo '--- dnsname finds host name of 131.193.178.100'
+dnsname 131.193.178.100
+echo $?
+
+echo '--- dnsname does not find 127.5.6.7'
+dnsname 127.5.6.7
+echo $?
+
+echo '--- dnsname rejects misformatted IP addresses'
+dnsname 1.2.3
+echo $?
+
+echo '--- dnsfilter finds some host names'
+echo '131.193.178.100+one two three
+127.5.6.7+one two three
+10+one two three' | dnsfilter
+echo $?
+
+
+echo '
+.movie.edu:1.2.3.4
++www.movie.edu:1.2.3.5
++www.movie.edu:1.2.3.6
++www.movie.edu:1.2.3.7
++www.movie.edu:1.2.3.8
++www.movie.edu:1.2.3.9
++www.movie.edu:1.2.3.10
++www.movie.edu:1.2.3.11
++www.movie.edu:1.2.3.12
++www.movie.edu:1.2.3.13
++www.movie.edu:1.2.3.14
++www.movie.edu:1.2.3.15
++www.movie.edu:1.2.3.16
++www.movie.edu:1.2.3.17
++www.movie.edu:1.2.3.18
++www.movie.edu:1.2.3.19
++www.movie.edu:1.2.3.20
++www.movie.edu:1.2.3.21
++www.movie.edu:1.2.3.22
++www.movie.edu:1.2.3.23
++www.movie.edu:1.2.3.24
++www.movie.edu:1.2.3.25
++www.movie.edu:1.2.3.26
++www.movie.edu:1.2.3.27
++www.movie.edu:1.2.3.28
++www.movie.edu:1.2.3.29
++www.movie.edu:1.2.3.30
++www.movie.edu:1.2.3.31
++www.movie.edu:1.2.3.32
++www.movie.edu:1.2.3.33
++www.movie.edu:1.2.3.34
++www.movie.edu:1.2.3.35
++www.movie.edu:1.2.3.36
++www.movie.edu:1.2.3.37
++www.movie.edu:1.2.3.38
++www.movie.edu:1.2.3.39
+' > rts-tmp/data
+
+echo '--- tinydns-data does not complain about large packets'
+( cd rts-tmp; tinydns-data; echo $? )
+( cd rts-tmp; tinydns-get a www.movie.edu; echo $? )
+
+echo '
+=movie.edu:1.2.3.4
+*star
+' > rts-tmp/data
+
+echo '--- tinydns-data complains about unrecognized initial characters'
+( cd rts-tmp; tinydns-data; echo $? )
+
+echo '
+.movie.edu:192.249.249.3:a
+.movie.edu::wormhole.movie.edu
+&fx.movie.edu:192.253.254.2:a
+&fx.movie.edu:192.253.254.3:b
+.249.249.192.in-addr.arpa:192.249.249.3:a
+.249.249.192.in-addr.arpa::wormhole.movie.edu
+.253.253.192.in-addr.arpa:192.249.249.3:a
+.253.253.192.in-addr.arpa:192.249.249.1:b
+.253.253.192.in-addr.arpa:192.253.253.1:c
+.254.253.192.in-addr.arpa:192.253.254.2:a
+.254.253.192.in-addr.arpa:192.253.254.3:b
+
++localhost.movie.edu:127.0.0.1
+
+@movie.edu:192.249.249.1:a
+
+'\''movie.edu:Movie University
+:movie.edu:12345:One
+:movie.edu:12345:Two
+:movie.edu:12346:Three
+:movie.edu:12346:Four
+
+=wormhole.movie.edu:192.249.249.1
++wh249.movie.edu:192.249.249.1
+=robocop.movie.edu:192.249.249.2
+=terminator.movie.edu:192.249.249.3
++bigt.movie.edu:192.249.249.3
+=diehard.movie.edu:192.249.294.4
++dh.movie.edu:192.249.294.4
+
+=wormhole.movie.edu:192.253.253.1
++wh253.movie.edu:192.253.253.1
++wh.movie.edu:192.253.253.1
++wh.movie.edu:192.253.253.1
+=misery.movie.edu:192.253.253.2
+=shining.movie.edu:192.253.253.3
+=carrie.movie.edu:192.253.253.4
+
+.blah.movie.edu:1.2.3.4:blah.movie.edu
+'\''blah.movie.edu:Text
+' > rts-tmp/data
+utime rts-tmp/data 987654321
+
+echo '--- tinydns-data complains if it cannot create data.tmp'
+rm -f rts-tmp/data.tmp
+ln -s data.tmp rts-tmp/data.tmp
+( cd rts-tmp; tinydns-data; echo $? )
+rm -f rts-tmp/data.tmp
+
+echo '--- tinydns-data handles simple example'
+( cd rts-tmp; tinydns-data; echo $? )
+
+echo '--- tinydns-data produces A records'
+( cd rts-tmp; tinydns-get 1 wormhole.movie.edu; echo $? )
+
+echo '--- tinydns-data produces NS records'
+( cd rts-tmp; tinydns-get 2 movie.edu; echo $? )
+
+echo '--- tinydns-data produces SOA records'
+( cd rts-tmp; tinydns-get 6 movie.edu; echo $? )
+
+echo '--- tinydns-data produces PTR records'
+( cd rts-tmp; tinydns-get 12 1.253.253.192.in-addr.arpa; echo $? )
+
+echo '--- tinydns-data produces MX records'
+( cd rts-tmp; tinydns-get 15 movie.edu; echo $? )
+
+echo '--- tinydns-data produces TXT records'
+( cd rts-tmp; tinydns-get 16 movie.edu; echo $? )
+
+echo '--- tinydns-data produces AXFR responses'
+( cd rts-tmp; tinydns-get 252 movie.edu; echo $? )
+
+echo '--- tinydns-data produces ANY responses'
+( cd rts-tmp; tinydns-get 255 movie.edu; echo $? )
+
+echo '--- tinydns-data produces records of any type'
+( cd rts-tmp; tinydns-get 12345 movie.edu; echo $? )
+( cd rts-tmp; tinydns-get 12346 movie.edu; echo $? )
+
+echo '--- tinydns-data produces NODATA responses'
+( cd rts-tmp; tinydns-get 54321 movie.edu; echo $? )
+
+echo '--- tinydns-data produces NXDOMAIN responses'
+( cd rts-tmp; tinydns-get 1 this.does.not.exist.movie.edu; echo $? )
+
+echo '--- tinydns-data produces NXDOMAIN responses for suffixes'
+( cd rts-tmp; tinydns-get 1 ns.movie.edu; echo $? )
+
+echo '--- tinydns-data produces NXDOMAIN ANY responses for suffixes'
+( cd rts-tmp; tinydns-get 255 ns.movie.edu; echo $? )
+
+echo '--- tinydns-data does not produce responses outside its bailiwick'
+( cd rts-tmp; tinydns-get 1 edu; echo $? )
+
+echo '--- tinydns-data does not include TXT in additional sections'
+( cd rts-tmp; tinydns-get 1 blah.movie.edu; echo $? )
+
+
+echo '
+.test:10.2.3.4:a
++b.ns.test:10.2.3.6:259200
+.test:10.2.3.5:b
+'\''127.test:0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+'\''128.test:01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567
+'\''254.test:01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123
+'\''255.test:012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
+'\''387.test:012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+'\''388.test:0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567
+'\''400.test:0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+'\''410.test:01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+'\''420.test:012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+'\''430.test:0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+'\''435.test:012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
+'\''436.test:0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+=\000\001\177\200\277\.\.\..test:10.5.6.7
+.7.6.5.10.in-addr.arpa:10.5.6.7
+
+&x.\0\1\177\200\277\.\.\..test:10.8.9.10
+' > rts-tmp/data
+utime rts-tmp/data 0
+
+echo '--- tinydns-data handles another example'
+( cd rts-tmp; tinydns-data; echo $? )
+
+echo '--- tinydns-data uses serial 1 for mtime 0'
+( cd rts-tmp; tinydns-get Any test; echo $? )
+
+echo '--- tinydns-data does not split size-127 TXT records'
+( cd rts-tmp; tinydns-get Txt 127.test; echo $? )
+
+echo '--- tinydns-data splits size-128 TXT records'
+( cd rts-tmp; tinydns-get 16 128.test; echo $? )
+
+echo '--- tinydns-data splits size-254 TXT records'
+( cd rts-tmp; tinydns-get 16 254.test; echo $? )
+
+echo '--- tinydns-data doubly splits size-255 TXT records'
+( cd rts-tmp; tinydns-get 16 255.test; echo $? )
+
+echo '--- tinydns-data excludes the additional section if necessary'
+( cd rts-tmp; tinydns-get 16 387.test; echo $? )
+( cd rts-tmp; tinydns-get 16 388.test; echo $? )
+
+echo '--- tinydns-data excludes the authority section if necessary'
+( cd rts-tmp; tinydns-get 16 435.test; echo $? )
+( cd rts-tmp; tinydns-get 16 436.test; echo $? )
+
+echo '--- tinydns-data handles unusual characters in owner names'
+( cd rts-tmp; tinydns-get A '\0\1\177\200\277\56\56\56.test'; echo $? )
+
+echo '--- tinydns-data handles unusual characters in PTR results'
+( cd rts-tmp; tinydns-get Ptr 7.6.5.10.in-addr.arpa; echo $? )
+
+echo '--- tinydns-data handles delegations'
+( cd rts-tmp; tinydns-get 1 'x.\0\1\177\200\277\56\56\56.test'; echo $? )
+( cd rts-tmp; tinydns-get 1 'ns.x.\0\1\177\200\277\56\56\56.test'; echo $? )
+( cd rts-tmp; tinydns-get 1 'z.y.x.\0\1\177\200\277\56\56\56.test'; echo $? )
+
+
+echo '
+Ztest:Primary.Server:Host.Master:1234567:2345678:3456789:4567890:5678901:98765
+&test:1.2.3.4::37
+@*.wild.test:1.2.3.7:mail.wild.test:54321:46
+&child.test:1.2.3.5::38
+@test:1.2.3.4:::41
+=test:1.2.3.4:39
++www.test:1.2.3.4:40
+'\''test:Text:42
+:test:12345:Binary:43
+Cmail.test:www.test:44
++*.wild.test:1.2.3.6:45
+=override.wild.test:1.2.3.8:47
++*.wild.wild.test:1.2.3.9:48
+&child.wild.test:1.2.3.10:49
+C*.alias.wild.test:wild.test:50
+' > rts-tmp/data
+utime rts-tmp/data 0
+
+echo '--- tinydns-data handles another example'
+( cd rts-tmp; tinydns-data; echo $? )
+
+echo '--- tinydns-data handles TTLs'
+( cd rts-tmp; tinydns-get 255 test; echo $? )
+( cd rts-tmp; tinydns-get 255 www.test; echo $? )
+( cd rts-tmp; tinydns-get 255 child.test; echo $? )
+
+echo '--- tinydns-data handles CNAMEs'
+( cd rts-tmp; tinydns-get 255 mail.test; echo $? )
+( cd rts-tmp; tinydns-get 5 mail.test; echo $? )
+( cd rts-tmp; tinydns-get 1 mail.test; echo $? )
+( cd rts-tmp; tinydns-get 255 foo.mail.test; echo $? )
+
+echo '--- tinydns-data does not apply wildcard A to base name'
+( cd rts-tmp; tinydns-get 1 wild.test; echo $? )
+
+echo '--- tinydns-data handles wildcard A records'
+( cd rts-tmp; tinydns-get 1 x.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 1 xy.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 1 x.z.wild.test; echo $? )
+
+echo '--- tinydns-data handles wildcard MX records'
+( cd rts-tmp; tinydns-get 255 wild.test; echo $? )
+
+echo '--- tinydns-data does not apply wildcard MX to base name'
+( cd rts-tmp; tinydns-get 255 x.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 255 xy.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 15 x.z.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 255 x.z.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 255 '*'.wild.test; echo $? )
+
+echo '--- tinydns-data uses wildcard under base of sub-wildcard'
+( cd rts-tmp; tinydns-get 255 alias.wild.test; echo $? )
+
+echo '--- tinydns-data handles wildcard CNAME records'
+( cd rts-tmp; tinydns-get 255 xyz.alias.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 255 '*'.alias.wild.test; echo $? )
+
+echo '--- tinydns-data lets explicit record override wildcard'
+( cd rts-tmp; tinydns-get 255 override.wild.test; echo $? )
+
+echo '--- tinydns-data handles overrides sanely'
+( cd rts-tmp; tinydns-get 255 x.override.wild.test; echo $? )
+
+echo '--- tinydns-data overrides wildcard with subdomain wildcard'
+( cd rts-tmp; tinydns-get 255 x.wild.wild.test; echo $? )
+
+echo '--- tinydns-data overrides wildcard with delegation'
+( cd rts-tmp; tinydns-get 255 child.wild.test; echo $? )
+( cd rts-tmp; tinydns-get 255 x.child.wild.test; echo $? )
+
+
+echo '
+.four:1.2.3.4::0:30000000fedcba98
++www.four:1.2.3.4:0:30000000fedcba98
+.five:1.2.3.5:::30000000fedcba98
++www.five:1.2.3.5::30000000fedcba98
+.six:1.2.3.6::0:50000000fedcba98
++www.six:1.2.3.6:0:50000000fedcba98
+.seven:1.2.3.7:::50000000fedcba98
++www.seven:1.2.3.7::50000000fedcba98
+' > rts-tmp/data
+utime rts-tmp/data 7654321
+
+echo '--- tinydns-data handles another example'
+( cd rts-tmp; tinydns-data; echo $? )
+
+echo '--- tinydns-data handles ending time'
+( cd rts-tmp; tinydns-get 255 www.four; echo $? )
+( cd rts-tmp; tinydns-get 255 www.six; echo $? )
+
+echo '--- tinydns-data handles starting time'
+( cd rts-tmp; tinydns-get 255 www.five; echo $? )
+( cd rts-tmp; tinydns-get 255 www.seven; echo $? )
+
+
+echo '--- tinydns-edit handles simple examples'
+echo '' > rts-tmp/data
+( cd rts-tmp; tinydns-edit data data.new add ns heaven.af.mil 1.2.3.5; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add ns heaven.af.mil 1.2.3.6; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add childns sub.heaven.af.mil 1.2.10.11; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add childns sub.heaven.af.mil 1.2.10.12; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add host lion.heaven.af.mil 1.2.3.4; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add host tiger.heaven.af.mil 1.2.3.5; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add host bear.heaven.af.mil 1.2.3.6; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add alias www.heaven.af.mil 1.2.3.4; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add mx heaven.af.mil 1.2.3.4; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add mx heaven.af.mil 1.2.3.7; echo $? )
+cat rts-tmp/data
+
+echo '--- tinydns-edit rejects hosts with old names or IP addresses'
+( cd rts-tmp; tinydns-edit data data.new add host panda.heaven.af.mil 1.2.3.6; echo $? )
+( cd rts-tmp; tinydns-edit data data.new add host bear.heaven.af.mil 1.2.3.8; echo $? )
+cat rts-tmp/data
+
+echo '--- tinydns-edit recognizes alternate forms of host names'
+( cd rts-tmp; tinydns-edit data data.new add host 'BE\101r.Heaven.AF..Mil.' 1.2.3.8; echo $? )
+cat rts-tmp/data
+
+echo '--- tinydns-edit copies TTLs from previous NS records'
+echo '.test:1.2.3.4:a:3600' > rts-tmp/data
+( cd rts-tmp; tinydns-edit data data.new add ns test 1.2.3.5; echo $? )
+cat rts-tmp/data
+
+
+
+echo '
+.Test:127.555.0.2
+=Www.Test:127.555.0.100
+=Www.Test:127.555.0.101
+@Test:127.555.0.100:a:1234
+@Test:127.555.0.101:b:45678
+&Pick.Test:127.555.0.3
+&Pick2.Test:127.555.0.3
+&Rbl.Test:127.555.0.5
+.Test2:127.555.0.2
++*.Test2:127.555.0.102
+C*.Www.Test2:Www.Test2:5000
+=one.Test2:127.555.0.103::300000003456789a
+=two.Test2:127.555.0.104:0:500000003456789a
+.Test3:127.555.0.3
+=Www.Test3:127.0.0.106
+.Test4:127.555.0.4
+'\''Test4:001234567890123456789012345678901234567890123456789
+'\''Test4:101234567890123456789012345678901234567890123456789
+'\''Test4:201234567890123456789012345678901234567890123456789
+'\''Test4:301234567890123456789012345678901234567890123456789
+'\''Test4:401234567890123456789012345678901234567890123456789
+'\''Test4:501234567890123456789012345678901234567890123456789
+'\''Test4:601234567890123456789012345678901234567890123456789
+'\''Test4:701234567890123456789012345678901234567890123456789
+'\''Test4:801234567890123456789012345678901234567890123456789
+'\''Test4:901234567890123456789012345678901234567890123456789
+' > $service/tinydns/root/data
+utime $service/tinydns/root/data 987654321
+( cd $service/tinydns/root; tinydns-data )
+
+echo '
+-Pick.Test:127.555.0.100
++Pick.Test:127.555.0.101
+-Pick2.Test:127.555.0.102:ME
++Pick2.Test:127.555.0.102:ME
+%ME:127
+' > $service/pickdns/root/data
+( cd $service/pickdns/root; pickdns-data )
+
+echo '
+4.0.0.1
+4.0.0.2/31
+4.0.0.4/30
+4.0.0.8/29
+4.0.0.16/28
+4.0.0.32/27
+4.0.0.64/26
+4.0.0.128/25
+4.0.1.0/24
+4.0.2.0/23
+4.0.4.0/22
+4.0.8.0/21
+4.0.16.0/20
+4.0.32.0/19
+4.0.64.0/18
+4.0.128.0/17
+4.1.0.0/16
+4.2.0.0/15
+4.4.0.0/14
+4.8.0.0/13
+4.16.0.0/12
+4.32.0.0/11
+4.64.0.0/10
+4.128.0.0/9
+5.0.0.0/8
+:127.0.0.3:See http://www.rbl.test/$
+' > $service/rbldns/root/data
+( cd $service/rbldns/root; rbldns-data )
+
+echo '
+127.:allow,AXFR="tEsT/TeSt2"
+:deny
+' > $service/axfrdns/tcp
+( cd $service/axfrdns; tcprules tcp.cdb tcp.tmp < tcp )
+
+
+echo '--- dnscache handles dotted-decimal names'
+dnsq 255 127.43.123.234 127.555.0.1
+echo $?
+
+echo '--- tinydns works'
+dnsip WWW.TEST | tr ' ' '\012' | sort
+echo $?
+dnsmx TEST
+echo $?
+dnsq 255 WWW.TEST 127.555.0.2
+echo $?
+dnsq Any TEST 127.555.0.2
+echo $?
+
+echo '--- walldns handles in-addr.arpa names'
+dnsname 127.555.6.7
+echo $?
+dnsname 127.555.123.234
+echo $?
+dnsip 234.123.43.127.IN-ADDR.ARPA
+echo $?
+dnsq 255 234.123.43.127.IN-ADDR.ARPA 127.555.0.4
+echo $?
+
+echo '--- walldns handles dotted-decimal names'
+dnsq 255 127.43.123.234 127.555.0.4
+echo $?
+
+echo '--- walldns rejects other names'
+dnsq 255 BLAH.TEST 127.555.0.4
+echo $?
+
+echo '--- rbldns works'
+dnsip 2.3.4.5.rbl.test
+echo $?
+dnstxt 2.3.4.5.rbl.test
+echo $?
+dnsq 255 2.3.4.5.rbl.test 127.555.0.5
+echo $?
+dnsip 200.255.1.4.rbl.test
+echo $?
+dnstxt 200.255.1.4.rbl.test
+echo $?
+dnsq 255 200.255.1.4.rbl.test 127.555.0.5
+echo $?
+dnsip 200.255.0.4.rbl.test
+echo $?
+dnstxt 200.255.0.4.rbl.test
+echo $?
+dnsq 255 200.255.0.4.rbl.test 127.555.0.5
+echo $?
+dnsip 1.0.0.4.rbl.test
+echo $?
+dnstxt 1.0.0.4.rbl.test
+echo $?
+dnsq 255 1.0.0.4.rbl.test 127.555.0.5
+echo $?
+dnsip 0.0.0.4.rbl.test
+echo $?
+dnstxt 0.0.0.4.rbl.test
+echo $?
+dnsq 255 0.0.0.4.rbl.test 127.555.0.5
+echo $?
+
+echo '--- pickdns works'
+dnsip PICK.TEST
+echo $?
+dnsip PICK2.TEST
+echo $?
+dnsq 255 PICK.TEST 127.555.0.3
+echo $?
+
+echo '--- pickdns rejects queries for unknown information'
+dnsq 255 PICK11.TEST 127.555.0.3
+echo $?
+dnsq Txt PICK2.TEST 127.555.0.3
+echo $?
+
+echo '--- axfrdns rejects unauthorized transfer attempts'
+tcpclient -RHl0 127.43.0.2 53 axfr-get TEST3 rts-tmp/zone rts-tmp/zone.tmp
+echo $?
+tcpclient -RHl0 127.43.0.2 53 axfr-get TEST4 rts-tmp/zone2 rts-tmp/zone2.tmp
+echo $?
+
+echo '--- axfrdns works'
+tcpclient -RHl0 127.43.0.2 53 axfr-get TEST rts-tmp/zone rts-tmp/zone.tmp
+echo $?
+cat rts-tmp/zone
+
+echo '--- axfrdns gives authoritative answers'
+dnsq any Test4 127.43.0.2
+echo $?
+
+echo '--- axfr-get handles zones with wildcards'
+tcpclient -RHl0 127.43.0.2 53 axfr-get TEST2 rts-tmp/zone2 rts-tmp/zone2.tmp
+echo $?
+cat rts-tmp/zone2
+
+
+svc -dx $service/dnscache
+svc -dx $service/tinydns
+svc -dx $service/pickdns
+svc -dx $service/walldns
+svc -dx $service/rbldns
+svc -dx $service/axfrdns
+
+svc -dx $service/dnscache/log
+svc -dx $service/tinydns/log
+svc -dx $service/pickdns/log
+svc -dx $service/walldns/log
+svc -dx $service/rbldns/log
+svc -dx $service/axfrdns/log
+
+wait
+wait
+wait
+wait
+wait
+wait
+
+exit 0

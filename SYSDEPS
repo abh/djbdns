@@ -1,0 +1,10 @@
+VERSION
+systype
+uint32.h
+uint64.h
+select.h
+iopause.h
+direntry.h
+hasshsgr.h
+hasdevtcp.h
+socket.lib

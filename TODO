@@ -1,0 +1,9 @@
+end-to-end nym-based security
+link-level security
+
+consider dd in dnstrace
+
+try to get the root authorities to set up a secure, usable NS-list system
+incorporate automatic NS-list upgrades
+
+DNS over IPv6

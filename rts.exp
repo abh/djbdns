@@ -1,0 +1,961 @@
+--- dnscache-conf works
+--- tinydns-conf works
+--- pickdns-conf works
+--- walldns-conf works
+--- rbldns-conf works
+--- axfrdns-conf works
+--- cache handles simple example
+
+
+
+
+
+un
+
+
+
+
+un
+deux
+
+
+
+un
+deux
+trois
+
+
+un
+deux
+trois
+quatre
+
+un
+deux
+trois
+quatre
+cinq
+een
+deux
+trois
+quatre
+cinq
+een
+twee
+trois
+quatre
+cinq
+een
+twee
+drie
+quatre
+cinq
+een
+twee
+drie
+vier
+cinq
+een
+twee
+drie
+vier
+vijf
+0
+--- cache handles overwriting
+
+
+
+
+
+un
+
+
+
+
+een
+
+
+
+
+een
+deux
+
+
+
+een
+twee
+
+
+
+een
+twee
+trois
+
+
+een
+twee
+drie
+
+
+
+twee
+drie
+quatre
+
+
+twee
+drie
+vier
+
+
+
+drie
+vier
+cinq
+
+
+drie
+vier
+vijf
+0
+--- cache handles long chains
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+--- dnsip finds IP address of network-surveys.cr.yp.to
+131.193.178.100 
+0
+--- dnsip does not find nonexistent.cr.yp.to
+
+0
+--- dnsip rejects overly long domain names
+dnsip: fatal: unable to find IP address for x.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789: protocol error
+111
+--- dnsip handles IP address on input
+1.2.3.4 
+127.0.0.1 
+10.43.166.133 
+10.43.166.133 
+0
+--- dnsip allows 0 to be omitted
+127.0.0.1 
+0
+--- dnsip handles multiple IP addresses on input
+1.2.3.4 5.6.7.8 9.10.11.12 13.14.15.16 
+0
+--- dnsipq handles simple examples
+1.2.3.4 1.2.3.4 
+localhost 127.0.0.1 
+localhost 127.0.0.1 
+5.6.7.8 5.6.7.8 
+network-surveys.cr.yp.to 131.193.178.100 
+nonexistent.whatever.cr.yp.to 
+0
+--- dnsmx finds MX record for network-surveys.cr.yp.to
+0 a.mx.network-surveys.cr.yp.to
+0
+--- dnsmx manufactures MX record for nonexistent.cr.yp.to
+0 nonexistent.cr.yp.to
+0
+--- dnsmx rejects overly long domain names
+dnsmx: fatal: unable to find MX records for 0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789: protocol error
+111
+--- dnstxt finds TXT record for leap.yp.to
+8222222206660602022066620620.
+0
+--- dnstxt does not find nonexistent.cr.yp.to
+
+0
+--- dnstxt rejects overly long domain names
+dnstxt: fatal: unable to find TXT records for 0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789: protocol error
+111
+--- dnsname finds host name of 131.193.178.100
+network-surveys.cr.yp.to
+0
+--- dnsname does not find 127.5.6.7
+
+0
+--- dnsname rejects misformatted IP addresses
+dnsname: fatal: unable to parse IP address 1.2.3
+111
+--- dnsfilter finds some host names
+131.193.178.100+one=network-surveys.cr.yp.to two three
+127.5.6.7+one two three
+10+one two three
+0
+--- tinydns-data does not complain about large packets
+0
+1 www.movie.edu:
+591 bytes, 1+35+0+0 records, response, authoritative, noerror
+query: 1 www.movie.edu
+answer: www.movie.edu 86400 A 1.2.3.5
+answer: www.movie.edu 86400 A 1.2.3.6
+answer: www.movie.edu 86400 A 1.2.3.7
+answer: www.movie.edu 86400 A 1.2.3.8
+answer: www.movie.edu 86400 A 1.2.3.9
+answer: www.movie.edu 86400 A 1.2.3.10
+answer: www.movie.edu 86400 A 1.2.3.11
+answer: www.movie.edu 86400 A 1.2.3.12
+answer: www.movie.edu 86400 A 1.2.3.13
+answer: www.movie.edu 86400 A 1.2.3.14
+answer: www.movie.edu 86400 A 1.2.3.15
+answer: www.movie.edu 86400 A 1.2.3.16
+answer: www.movie.edu 86400 A 1.2.3.17
+answer: www.movie.edu 86400 A 1.2.3.18
+answer: www.movie.edu 86400 A 1.2.3.19
+answer: www.movie.edu 86400 A 1.2.3.20
+answer: www.movie.edu 86400 A 1.2.3.21
+answer: www.movie.edu 86400 A 1.2.3.22
+answer: www.movie.edu 86400 A 1.2.3.23
+answer: www.movie.edu 86400 A 1.2.3.24
+answer: www.movie.edu 86400 A 1.2.3.25
+answer: www.movie.edu 86400 A 1.2.3.26
+answer: www.movie.edu 86400 A 1.2.3.27
+answer: www.movie.edu 86400 A 1.2.3.28
+answer: www.movie.edu 86400 A 1.2.3.29
+answer: www.movie.edu 86400 A 1.2.3.30
+answer: www.movie.edu 86400 A 1.2.3.31
+answer: www.movie.edu 86400 A 1.2.3.32
+answer: www.movie.edu 86400 A 1.2.3.33
+answer: www.movie.edu 86400 A 1.2.3.34
+answer: www.movie.edu 86400 A 1.2.3.35
+answer: www.movie.edu 86400 A 1.2.3.36
+answer: www.movie.edu 86400 A 1.2.3.37
+answer: www.movie.edu 86400 A 1.2.3.38
+answer: www.movie.edu 86400 A 1.2.3.39
+0
+--- tinydns-data complains about unrecognized initial characters
+tinydns-data: fatal: unable to parse data line 3: unrecognized leading character
+111
+--- tinydns-data complains if it cannot create data.tmp
+tinydns-data: fatal: unable to create data.tmp: symbolic link loop
+111
+--- tinydns-data handles simple example
+0
+--- tinydns-data produces A records
+1 wormhole.movie.edu:
+117 bytes, 1+2+2+1 records, response, authoritative, noerror
+query: 1 wormhole.movie.edu
+answer: wormhole.movie.edu 86400 A 192.249.249.1
+answer: wormhole.movie.edu 86400 A 192.253.253.1
+authority: movie.edu 259200 NS a.ns.movie.edu
+authority: movie.edu 259200 NS wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+0
+--- tinydns-data produces NS records
+2 movie.edu:
+117 bytes, 1+2+0+3 records, response, authoritative, noerror
+query: 2 movie.edu
+answer: movie.edu 259200 NS a.ns.movie.edu
+answer: movie.edu 259200 NS wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+0
+--- tinydns-data produces SOA records
+6 movie.edu:
+164 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 6 movie.edu
+answer: movie.edu 2560 SOA a.ns.movie.edu hostmaster.movie.edu 987654321 16384 2048 1048576 2560
+authority: movie.edu 259200 NS a.ns.movie.edu
+authority: movie.edu 259200 NS wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+0
+--- tinydns-data produces PTR records
+12 1.253.253.192.in-addr.arpa:
+175 bytes, 1+1+3+3 records, response, authoritative, noerror
+query: 12 1.253.253.192.in-addr.arpa
+answer: 1.253.253.192.in-addr.arpa 86400 PTR wormhole.movie.edu
+authority: 253.253.192.in-addr.arpa 259200 NS a.ns.253.253.192.in-addr.arpa
+authority: 253.253.192.in-addr.arpa 259200 NS b.ns.253.253.192.in-addr.arpa
+authority: 253.253.192.in-addr.arpa 259200 NS c.ns.253.253.192.in-addr.arpa
+additional: a.ns.253.253.192.in-addr.arpa 259200 A 192.249.249.3
+additional: b.ns.253.253.192.in-addr.arpa 259200 A 192.249.249.1
+additional: c.ns.253.253.192.in-addr.arpa 259200 A 192.253.253.1
+0
+--- tinydns-data produces MX records
+15 movie.edu:
+154 bytes, 1+1+2+4 records, response, authoritative, noerror
+query: 15 movie.edu
+answer: movie.edu 86400 MX 0 a.mx.movie.edu
+authority: movie.edu 259200 NS a.ns.movie.edu
+authority: movie.edu 259200 NS wormhole.movie.edu
+additional: a.mx.movie.edu 86400 A 192.249.249.1
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+0
+--- tinydns-data produces TXT records
+16 movie.edu:
+146 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 16 movie.edu
+answer: movie.edu 86400 16 \020Movie\040University
+authority: movie.edu 259200 NS a.ns.movie.edu
+authority: movie.edu 259200 NS wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+0
+--- tinydns-data produces AXFR responses
+252 movie.edu:
+27 bytes, 1+0+0+0 records, response, authoritative, notimp
+query: 252 movie.edu
+0
+--- tinydns-data produces ANY responses
+255 movie.edu:
+293 bytes, 1+9+0+4 records, response, authoritative, noerror
+query: 255 movie.edu
+answer: movie.edu 2560 SOA a.ns.movie.edu hostmaster.movie.edu 987654321 16384 2048 1048576 2560
+answer: movie.edu 259200 NS a.ns.movie.edu
+answer: movie.edu 259200 NS wormhole.movie.edu
+answer: movie.edu 86400 MX 0 a.mx.movie.edu
+answer: movie.edu 86400 16 \020Movie\040University
+answer: movie.edu 86400 12345 One
+answer: movie.edu 86400 12345 Two
+answer: movie.edu 86400 12346 Three
+answer: movie.edu 86400 12346 Four
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+additional: a.mx.movie.edu 86400 A 192.249.249.1
+0
+--- tinydns-data produces records of any type
+12345 movie.edu:
+147 bytes, 1+2+2+3 records, response, authoritative, noerror
+query: 12345 movie.edu
+answer: movie.edu 86400 12345 One
+answer: movie.edu 86400 12345 Two
+authority: movie.edu 259200 NS a.ns.movie.edu
+authority: movie.edu 259200 NS wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+0
+12346 movie.edu:
+150 bytes, 1+2+2+3 records, response, authoritative, noerror
+query: 12346 movie.edu
+answer: movie.edu 86400 12346 Three
+answer: movie.edu 86400 12346 Four
+authority: movie.edu 259200 NS a.ns.movie.edu
+authority: movie.edu 259200 NS wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
+additional: wormhole.movie.edu 86400 A 192.249.249.1
+additional: wormhole.movie.edu 86400 A 192.253.253.1
+0
+--- tinydns-data produces NODATA responses
+54321 movie.edu:
+79 bytes, 1+0+1+0 records, response, authoritative, noerror
+query: 54321 movie.edu
+authority: movie.edu 2560 SOA a.ns.movie.edu hostmaster.movie.edu 987654321 16384 2048 1048576 2560
+0
+--- tinydns-data produces NXDOMAIN responses
+1 this.does.not.exist.movie.edu:
+99 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 1 this.does.not.exist.movie.edu
+authority: movie.edu 2560 SOA a.ns.movie.edu hostmaster.movie.edu 987654321 16384 2048 1048576 2560
+0
+--- tinydns-data produces NXDOMAIN responses for suffixes
+1 ns.movie.edu:
+79 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 1 ns.movie.edu
+authority: movie.edu 2560 SOA a.ns.movie.edu hostmaster.movie.edu 987654321 16384 2048 1048576 2560
+0
+--- tinydns-data produces NXDOMAIN ANY responses for suffixes
+255 ns.movie.edu:
+79 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 ns.movie.edu
+authority: movie.edu 2560 SOA a.ns.movie.edu hostmaster.movie.edu 987654321 16384 2048 1048576 2560
+0
+--- tinydns-data does not produce responses outside its bailiwick
+1 edu:
+0
+--- tinydns-data does not include TXT in additional sections
+1 blah.movie.edu:
+62 bytes, 1+1+1+0 records, response, authoritative, noerror
+query: 1 blah.movie.edu
+answer: blah.movie.edu 259200 A 1.2.3.4
+authority: blah.movie.edu 259200 NS blah.movie.edu
+0
+--- tinydns-data handles another example
+0
+--- tinydns-data uses serial 1 for mtime 0
+255 test:
+152 bytes, 1+3+0+3 records, response, authoritative, noerror
+query: 255 test
+answer: test 2560 SOA a.ns.test hostmaster.test 1 16384 2048 1048576 2560
+answer: test 259200 NS a.ns.test
+answer: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+--- tinydns-data does not split size-127 TXT records
+16 127.test:
+249 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 16 127.test
+answer: 127.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+--- tinydns-data splits size-128 TXT records
+16 128.test:
+251 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 16 128.test
+answer: 128.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\0017
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+--- tinydns-data splits size-254 TXT records
+16 254.test:
+377 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 16 254.test
+answer: 254.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+--- tinydns-data doubly splits size-255 TXT records
+16 255.test:
+379 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 16 255.test
+answer: 255.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123\0014
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+--- tinydns-data excludes the additional section if necessary
+16 387.test:
+512 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 16 387.test
+answer: 387.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123\1774567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\006123456
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+16 388.test:
+465 bytes, 1+1+2+0 records, response, authoritative, noerror
+query: 16 388.test
+answer: 388.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123\1774567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\0071234567
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+0
+--- tinydns-data excludes the authority section if necessary
+16 435.test:
+512 bytes, 1+1+2+0 records, response, authoritative, noerror
+query: 16 435.test
+answer: 435.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123\17745678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678906123456789012345678901234567890123456789012345678901234
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+0
+16 436.test:
+478 bytes, 1+1+0+0 records, response, authoritative, noerror
+query: 16 436.test
+answer: 436.test 86400 16 \1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123\177456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789071234567890123456789012345678901234567890123456789012345
+0
+--- tinydns-data handles unusual characters in owner names
+1 \000\001\177\200\277\056\056\056.test:
+130 bytes, 1+1+2+3 records, response, authoritative, noerror
+query: 1 \000\001\177\200\277\056\056\056.test
+answer: \000\001\177\200\277\056\056\056.test 86400 A 10.5.6.7
+authority: test 259200 NS a.ns.test
+authority: test 259200 NS b.ns.test
+additional: a.ns.test 259200 A 10.2.3.4
+additional: b.ns.test 259200 A 10.2.3.6
+additional: b.ns.test 259200 A 10.2.3.5
+0
+--- tinydns-data handles unusual characters in PTR results
+12 7.6.5.10.in-addr.arpa:
+99 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 12 7.6.5.10.in-addr.arpa
+answer: 7.6.5.10.in-addr.arpa 86400 PTR \000\001\177\200\277\056\056\056.test
+authority: 7.6.5.10.in-addr.arpa 259200 NS ns.7.6.5.10.in-addr.arpa
+additional: ns.7.6.5.10.in-addr.arpa 259200 A 10.5.6.7
+0
+--- tinydns-data handles delegations
+1 x.\000\001\177\200\277\056\056\056.test:
+66 bytes, 1+0+1+1 records, response, noerror
+query: 1 x.\000\001\177\200\277\056\056\056.test
+authority: x.\000\001\177\200\277\056\056\056.test 259200 NS ns.x.\000\001\177\200\277\056\056\056.test
+additional: ns.x.\000\001\177\200\277\056\056\056.test 259200 A 10.8.9.10
+0
+1 ns.x.\000\001\177\200\277\056\056\056.test:
+66 bytes, 1+0+1+1 records, response, noerror
+query: 1 ns.x.\000\001\177\200\277\056\056\056.test
+authority: x.\000\001\177\200\277\056\056\056.test 259200 NS ns.x.\000\001\177\200\277\056\056\056.test
+additional: ns.x.\000\001\177\200\277\056\056\056.test 259200 A 10.8.9.10
+0
+1 z.y.x.\000\001\177\200\277\056\056\056.test:
+70 bytes, 1+0+1+1 records, response, noerror
+query: 1 z.y.x.\000\001\177\200\277\056\056\056.test
+authority: x.\000\001\177\200\277\056\056\056.test 259200 NS ns.x.\000\001\177\200\277\056\056\056.test
+additional: ns.x.\000\001\177\200\277\056\056\056.test 259200 A 10.8.9.10
+0
+--- tinydns-data handles another example
+0
+--- tinydns-data handles TTLs
+255 test:
+202 bytes, 1+6+0+2 records, response, authoritative, noerror
+query: 255 test
+answer: test 98765 SOA primary.server host.master 1234567 2345678 3456789 4567890 5678901
+answer: test 37 NS ns.test
+answer: test 41 MX 0 mx.test
+answer: test 39 A 1.2.3.4
+answer: test 42 16 \004Text
+answer: test 43 12345 Binary
+additional: ns.test 37 A 1.2.3.4
+additional: mx.test 41 A 1.2.3.4
+0
+255 www.test:
+75 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 www.test
+answer: www.test 40 A 1.2.3.4
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+255 child.test:
+61 bytes, 1+0+1+1 records, response, noerror
+query: 255 child.test
+authority: child.test 38 NS ns.child.test
+additional: ns.child.test 38 A 1.2.3.5
+0
+--- tinydns-data handles CNAMEs
+255 mail.test:
+78 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 mail.test
+answer: mail.test 44 CNAME www.test
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+5 mail.test:
+78 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 5 mail.test
+answer: mail.test 44 CNAME www.test
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+1 mail.test:
+78 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 1 mail.test
+answer: mail.test 44 CNAME www.test
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+255 foo.mail.test:
+92 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 foo.mail.test
+authority: test 98765 SOA primary.server host.master 1234567 2345678 3456789 4567890 5678901
+0
+--- tinydns-data does not apply wildcard A to base name
+1 wild.test:
+88 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 1 wild.test
+authority: test 98765 SOA primary.server host.master 1234567 2345678 3456789 4567890 5678901
+0
+--- tinydns-data handles wildcard A records
+1 x.wild.test:
+78 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 1 x.wild.test
+answer: x.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+1 xy.wild.test:
+79 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 1 xy.wild.test
+answer: xy.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+1 x.z.wild.test:
+80 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 1 x.z.wild.test
+answer: x.z.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data handles wildcard MX records
+255 wild.test:
+88 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 wild.test
+authority: test 98765 SOA primary.server host.master 1234567 2345678 3456789 4567890 5678901
+0
+--- tinydns-data does not apply wildcard MX to base name
+255 x.wild.test:
+115 bytes, 1+2+1+2 records, response, authoritative, noerror
+query: 255 x.wild.test
+answer: x.wild.test 46 MX 54321 mail.wild.test
+answer: x.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+255 xy.wild.test:
+116 bytes, 1+2+1+2 records, response, authoritative, noerror
+query: 255 xy.wild.test
+answer: xy.wild.test 46 MX 54321 mail.wild.test
+answer: xy.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+15 x.z.wild.test:
+101 bytes, 1+1+1+2 records, response, authoritative, noerror
+query: 15 x.z.wild.test
+answer: x.z.wild.test 46 MX 54321 mail.wild.test
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+255 x.z.wild.test:
+117 bytes, 1+2+1+2 records, response, authoritative, noerror
+query: 255 x.z.wild.test
+answer: x.z.wild.test 46 MX 54321 mail.wild.test
+answer: x.z.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+255 \052.wild.test:
+115 bytes, 1+2+1+2 records, response, authoritative, noerror
+query: 255 \052.wild.test
+answer: \052.wild.test 46 MX 54321 mail.wild.test
+answer: \052.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data uses wildcard under base of sub-wildcard
+255 alias.wild.test:
+119 bytes, 1+2+1+2 records, response, authoritative, noerror
+query: 255 alias.wild.test
+answer: alias.wild.test 46 MX 54321 mail.wild.test
+answer: alias.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data handles wildcard CNAME records
+255 xyz.alias.wild.test:
+84 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 xyz.alias.wild.test
+answer: xyz.alias.wild.test 50 CNAME wild.test
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+255 \052.alias.wild.test:
+82 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 \052.alias.wild.test
+answer: \052.alias.wild.test 50 CNAME wild.test
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data lets explicit record override wildcard
+255 override.wild.test:
+85 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 override.wild.test
+answer: override.wild.test 47 A 1.2.3.8
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data handles overrides sanely
+255 x.override.wild.test:
+124 bytes, 1+2+1+2 records, response, authoritative, noerror
+query: 255 x.override.wild.test
+answer: x.override.wild.test 46 MX 54321 mail.wild.test
+answer: x.override.wild.test 45 A 1.2.3.6
+authority: test 37 NS ns.test
+additional: mail.wild.test 46 A 1.2.3.7
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data overrides wildcard with subdomain wildcard
+255 x.wild.wild.test:
+83 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 x.wild.wild.test
+answer: x.wild.wild.test 48 A 1.2.3.9
+authority: test 37 NS ns.test
+additional: ns.test 37 A 1.2.3.4
+0
+--- tinydns-data overrides wildcard with delegation
+255 child.wild.test:
+69 bytes, 1+0+1+1 records, response, noerror
+query: 255 child.wild.test
+authority: child.wild.test 259200 NS 49.ns.child.wild.test
+additional: 49.ns.child.wild.test 259200 A 1.2.3.10
+0
+255 x.child.wild.test:
+71 bytes, 1+0+1+1 records, response, noerror
+query: 255 x.child.wild.test
+authority: child.wild.test 259200 NS 49.ns.child.wild.test
+additional: 49.ns.child.wild.test 259200 A 1.2.3.10
+0
+--- tinydns-data handles another example
+0
+--- tinydns-data handles ending time
+255 www.four:
+0
+255 www.six:
+74 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 www.six
+answer: www.six 3600 A 1.2.3.6
+authority: six 3600 NS ns.six
+additional: ns.six 3600 A 1.2.3.6
+0
+--- tinydns-data handles starting time
+255 www.five:
+75 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 www.five
+answer: www.five 86400 A 1.2.3.5
+authority: five 259200 NS ns.five
+additional: ns.five 259200 A 1.2.3.5
+0
+255 www.seven:
+0
+--- tinydns-edit handles simple examples
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+
+.heaven.af.mil:1.2.3.5:a:259200
+.heaven.af.mil:1.2.3.6:b:259200
+&sub.heaven.af.mil:1.2.10.11:a:259200
+&sub.heaven.af.mil:1.2.10.12:b:259200
+=lion.heaven.af.mil:1.2.3.4:86400
+=tiger.heaven.af.mil:1.2.3.5:86400
+=bear.heaven.af.mil:1.2.3.6:86400
++www.heaven.af.mil:1.2.3.4:86400
+@heaven.af.mil:1.2.3.4:a::86400
+@heaven.af.mil:1.2.3.7:b::86400
+--- tinydns-edit rejects hosts with old names or IP addresses
+tinydns-edit: fatal: IP address already used
+100
+tinydns-edit: fatal: host name already used
+100
+
+.heaven.af.mil:1.2.3.5:a:259200
+.heaven.af.mil:1.2.3.6:b:259200
+&sub.heaven.af.mil:1.2.10.11:a:259200
+&sub.heaven.af.mil:1.2.10.12:b:259200
+=lion.heaven.af.mil:1.2.3.4:86400
+=tiger.heaven.af.mil:1.2.3.5:86400
+=bear.heaven.af.mil:1.2.3.6:86400
++www.heaven.af.mil:1.2.3.4:86400
+@heaven.af.mil:1.2.3.4:a::86400
+@heaven.af.mil:1.2.3.7:b::86400
+--- tinydns-edit recognizes alternate forms of host names
+tinydns-edit: fatal: host name already used
+100
+
+.heaven.af.mil:1.2.3.5:a:259200
+.heaven.af.mil:1.2.3.6:b:259200
+&sub.heaven.af.mil:1.2.10.11:a:259200
+&sub.heaven.af.mil:1.2.10.12:b:259200
+=lion.heaven.af.mil:1.2.3.4:86400
+=tiger.heaven.af.mil:1.2.3.5:86400
+=bear.heaven.af.mil:1.2.3.6:86400
++www.heaven.af.mil:1.2.3.4:86400
+@heaven.af.mil:1.2.3.4:a::86400
+@heaven.af.mil:1.2.3.7:b::86400
+--- tinydns-edit copies TTLs from previous NS records
+0
+.test:1.2.3.4:a:3600
+.test:1.2.3.5:b:3600
+--- dnscache handles dotted-decimal names
+255 127.43.123.234:
+48 bytes, 1+1+0+0 records, response, weird rd, weird ra, noerror
+query: 255 127.43.123.234
+answer: 127.43.123.234 0 A 127.43.123.234
+0
+--- tinydns works
+
+127.43.0.100
+127.43.0.101
+0
+1234 a.mx.test
+45678 b.mx.test
+0
+255 www.test:
+91 bytes, 1+2+1+1 records, response, authoritative, noerror
+query: 255 www.test
+answer: www.test 86400 A 127.43.0.100
+answer: www.test 86400 A 127.43.0.101
+authority: test 259200 NS ns.test
+additional: ns.test 259200 A 127.43.0.2
+0
+255 test:
+173 bytes, 1+4+0+3 records, response, authoritative, noerror
+query: 255 test
+answer: test 2560 SOA ns.test hostmaster.test 987654321 16384 2048 1048576 2560
+answer: test 259200 NS ns.test
+answer: test 86400 MX 1234 a.mx.test
+answer: test 86400 MX 45678 b.mx.test
+additional: ns.test 259200 A 127.43.0.2
+additional: a.mx.test 86400 A 127.43.0.100
+additional: b.mx.test 86400 A 127.43.0.101
+0
+--- walldns handles in-addr.arpa names
+7.6.43.127.in-addr.arpa
+0
+234.123.43.127.in-addr.arpa
+0
+127.43.123.234 
+0
+255 234.123.43.127.in-addr.arpa:
+75 bytes, 1+2+0+0 records, response, authoritative, noerror
+query: 255 234.123.43.127.in-addr.arpa
+answer: 234.123.43.127.in-addr.arpa 655360 A 127.43.123.234
+answer: 234.123.43.127.in-addr.arpa 655360 PTR 234.123.43.127.in-addr.arpa
+0
+--- walldns handles dotted-decimal names
+255 127.43.123.234:
+48 bytes, 1+1+0+0 records, response, authoritative, noerror
+query: 255 127.43.123.234
+answer: 127.43.123.234 655360 A 127.43.123.234
+0
+--- walldns rejects other names
+255 blah.test:
+temporary failure
+0
+--- rbldns works
+127.0.0.3 
+0
+See http://www.rbl.test/5.4.3.2
+0
+255 2.3.4.5.rbl.test:
+94 bytes, 1+2+0+0 records, response, authoritative, noerror
+query: 255 2.3.4.5.rbl.test
+answer: 2.3.4.5.rbl.test 2048 A 127.0.0.3
+answer: 2.3.4.5.rbl.test 2048 16 \037See\040http://www.rbl.test/5.4.3.2
+0
+127.0.0.3 
+0
+See http://www.rbl.test/4.1.255.200
+0
+255 200.255.1.4.rbl.test:
+102 bytes, 1+2+0+0 records, response, authoritative, noerror
+query: 255 200.255.1.4.rbl.test
+answer: 200.255.1.4.rbl.test 2048 A 127.0.0.3
+answer: 200.255.1.4.rbl.test 2048 16 #See\040http://www.rbl.test/4.1.255.200
+0
+127.0.0.3 
+0
+See http://www.rbl.test/4.0.255.200
+0
+255 200.255.0.4.rbl.test:
+102 bytes, 1+2+0+0 records, response, authoritative, noerror
+query: 255 200.255.0.4.rbl.test
+answer: 200.255.0.4.rbl.test 2048 A 127.0.0.3
+answer: 200.255.0.4.rbl.test 2048 16 #See\040http://www.rbl.test/4.0.255.200
+0
+127.0.0.3 
+0
+See http://www.rbl.test/4.0.0.1
+0
+255 1.0.0.4.rbl.test:
+94 bytes, 1+2+0+0 records, response, authoritative, noerror
+query: 255 1.0.0.4.rbl.test
+answer: 1.0.0.4.rbl.test 2048 A 127.0.0.3
+answer: 1.0.0.4.rbl.test 2048 16 \037See\040http://www.rbl.test/4.0.0.1
+0
+
+0
+
+0
+255 0.0.0.4.rbl.test:
+34 bytes, 1+0+0+0 records, response, authoritative, nxdomain
+query: 255 0.0.0.4.rbl.test
+0
+--- pickdns works
+127.43.0.101 
+0
+127.43.0.102 
+0
+255 pick.test:
+43 bytes, 1+1+0+0 records, response, authoritative, noerror
+query: 255 pick.test
+answer: pick.test 5 A 127.43.0.101
+0
+--- pickdns rejects queries for unknown information
+255 pick11.test:
+temporary failure
+0
+16 pick2.test:
+temporary failure
+0
+--- axfrdns rejects unauthorized transfer attempts
+axfr-get: fatal: unable to parse AXFR results: protocol error
+111
+axfr-get: fatal: unable to parse AXFR results: protocol error
+111
+--- axfrdns works
+0
+#987654321 auto axfr-get
+Ztest:ns.test.:hostmaster.test.:987654321:16384:2048:1048576:2560:2560
+&test::ns.test.:259200
++ns.test:127.43.0.2:259200
++www.test:127.43.0.100:86400
++www.test:127.43.0.101:86400
+@test::a.mx.test.:1234:86400
++a.mx.test:127.43.0.100:86400
+@test::b.mx.test.:45678:86400
++b.mx.test:127.43.0.101:86400
+&pick.test::ns.pick.test.:259200
++ns.pick.test:127.43.0.3:259200
+&pick2.test::ns.pick2.test.:259200
++ns.pick2.test:127.43.0.3:259200
+&rbl.test::ns.rbl.test.:259200
++ns.rbl.test:127.43.0.5:259200
+--- axfrdns gives authoritative answers
+255 test4:
+727 bytes, 1+12+0+0 records, response, authoritative, noerror
+query: 255 test4
+answer: test4 2560 SOA ns.test4 hostmaster.test4 987654321 16384 2048 1048576 2560
+answer: test4 259200 NS ns.test4
+answer: test4 86400 16 3001234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3101234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3201234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3301234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3401234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3501234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3601234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3701234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3801234567890123456789012345678901234567890123456789
+answer: test4 86400 16 3901234567890123456789012345678901234567890123456789
+0
+--- axfr-get handles zones with wildcards
+0
+#987654321 auto axfr-get
+Ztest2:ns.test2.:hostmaster.test2.:987654321:16384:2048:1048576:2560:2560
+&test2::ns.test2.:259200
++ns.test2:127.43.0.2:259200
++\052.test2:127.43.0.102:86400
+C\052.www.test2:www.test2.:5000
++one.test2:127.43.0.103:86400
++two.test2:127.43.0.104:2
