@@ -1,6 +1,6 @@
 # Requirements:
 # You are running as root.
-# You have dnscache, dnslog, tinydns, pickdns, walldns, and axfrdns accounts.
+# You have dns{cache,log}, {tiny,pick,wall,axfr,rbl}dns accounts.
 # You have local IP addresses 127.43.0.{1,2,3,4,5}.
 #
 # Some features not tested here:
@@ -595,7 +595,7 @@ echo '
 
 
 echo '--- dnscache handles dotted-decimal names'
-dnsq 255 127.43.123.234 127.555.0.1
+dnsqr 255 127.43.123.234
 echo $?
 
 echo '--- tinydns works'

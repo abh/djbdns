@@ -191,6 +191,8 @@ getopt.a
 dnsfilter
 random-ip.o
 random-ip
+dnsqr.o
+dnsqr
 dnsq.o
 dnsq
 dnstrace.o

@@ -13,6 +13,8 @@
 #include "response.h"
 #include "query.h"
 
+extern int numactive;
+
 static void cachegeneric(char type[2],char *d,char *data,unsigned int datalen,uint32 ttl)
 {
   unsigned int len;
@@ -703,7 +705,7 @@ static int doit(struct query *z,int state)
 	  log_nodata(whichserver,d,dtype,soattl);
         }
 
-  log_stats(&query_count,&cache_motion);
+  log_stats(&query_count,&cache_motion,&numactive);
 
 
   if (flagout || flagsoa || !flagreferral) {

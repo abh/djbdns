@@ -22,6 +22,7 @@ char *error_str(int i)
   X(error_nodevice,"device not configured")
   X(error_proto,"protocol error")
   X(error_isdir,"is a directory")
+  X(error_connrefused,"connection refused")
 #ifdef ESRCH
   X(ESRCH,"no such process")
 #endif
@@ -159,9 +160,6 @@ char *error_str(int i)
 #endif
 #ifdef ETOOMANYREFS
   X(ETOOMANYREFS,"too many references")
-#endif
-#ifdef ECONNREFUSED
-  X(ECONNREFUSED,"connection refused")
 #endif
 #ifdef ELOOP
   X(ELOOP,"symbolic link loop")

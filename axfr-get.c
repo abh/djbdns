@@ -186,6 +186,14 @@ unsigned int doit(char *buf,unsigned int len,unsigned int pos)
     if (!dns_domain_todot_cat(&line,d1)) return 0;
     if (!stralloc_cats(&line,".")) return 0;
   }
+  else if (byte_equal(data,2,DNS_T_PTR)) {
+    if (!stralloc_copys(&line,"^")) return 0;
+    if (!dns_domain_todot_cat(&line,d1)) return 0;
+    if (!stralloc_cats(&line,":")) return 0;
+    x_getname(buf,len,pos,&d1);
+    if (!dns_domain_todot_cat(&line,d1)) return 0;
+    if (!stralloc_cats(&line,".")) return 0;
+  }
   else if (byte_equal(data,2,DNS_T_MX)) {
     uint16 dist;
     if (!stralloc_copys(&line,"@")) return 0;

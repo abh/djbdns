@@ -32,6 +32,6 @@ extern void log_rrptr(char *,char *,char *,unsigned int);
 extern void log_rrmx(char *,char *,char *,char *,unsigned int);
 extern void log_rrsoa(char *,char *,char *,char *,char *,unsigned int);
 
-extern void log_stats(uint64 *,uint64 *);
+extern void log_stats(uint64 *,uint64 *,int *);
 
 #endif

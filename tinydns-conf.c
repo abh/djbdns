@@ -36,14 +36,17 @@ main(int argc,char **argv)
   init(dir,FATAL);
   makelog(loguser,pw->pw_uid,pw->pw_gid);
 
+  makedir("env");
+  perm(02755);
+  start("env/ROOT"); outs(dir); outs("/root\n"); finish();
+  perm(0644);
+  start("env/IP"); outs(myip); outs("\n"); finish();
+  perm(0644);
+
   start("run");
-  outs("#!/bin/sh\nexec 2>&1\n");
-  outs("ROOT="); outs(dir); outs("/root; export ROOT\n");
-  outs("IP="); outs(myip); outs("; export IP\n");
-  outs("exec envuidgid "); outs(user);
-  outs(" \\\nsoftlimit -d250000");
-  outs(" \\\n"); outs(auto_home); outs("/bin/tinydns");
-  outs("\n");
+  outs("#!/bin/sh\nexec 2>&1\nexec envuidgid "); outs(user);
+  outs(" envdir ./env softlimit -d250000 ");
+  outs(auto_home); outs("/bin/tinydns\n");
   finish();
   perm(0755);
 

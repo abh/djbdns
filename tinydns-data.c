@@ -379,6 +379,8 @@ main()
 	  syntaxerror(": type NS prohibited");
 	if (byte_equal(type,2,DNS_T_CNAME))
 	  syntaxerror(": type CNAME prohibited");
+	if (byte_equal(type,2,DNS_T_PTR))
+	  syntaxerror(": type PTR prohibited");
 	if (byte_equal(type,2,DNS_T_MX))
 	  syntaxerror(": type MX prohibited");
 

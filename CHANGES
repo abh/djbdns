@@ -270,3 +270,19 @@
 		tnx Chris Saia.
 20000325
 	version: DNScache 1.00.
+20000914
+	ui: axfr-get decodes PTR. tnx to various people.
+	ui: added dnsqr.
+20000915
+	portability problem: on some buggy kernels, accept() fails to
+		copy O_NONBLOCK. tnx Pavel Kankovsky. impact: with these
+		kernels, dnscache hangs if a TCP connection times out.
+		fix: ndelay_on() after accept().
+	ui: dnscache discards non-recursive queries.
+	ui: *-conf use envdir in */run.
+	internal: reorganized seed_addtime() calls in dnscache-conf.
+	ui: tinydns-data prohibits PTR in generic records.
+20000917
+	ui: dns_transmit_get() does not pause after most recv() errors.
+		still pauses after connection-refused when udploop is 2.
+	version: djbdns 1.01.

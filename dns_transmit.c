@@ -260,7 +260,7 @@ have sent query to curserver on UDP socket s
 */
     r = recv(fd,udpbuf,sizeof udpbuf,0);
     if (r <= 0) {
-      if (d->udploop == 2) return 0;
+      if (errno == error_connrefused) if (d->udploop == 2) return 0;
       return nextudp(d);
     }
     if (r + 1 > sizeof udpbuf) return 0;

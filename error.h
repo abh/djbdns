@@ -19,6 +19,7 @@ extern int error_acces;
 extern int error_nodevice;
 extern int error_proto;
 extern int error_isdir;
+extern int error_connrefused;
 
 extern char *error_str(int);
 extern int error_temp(int);

@@ -42,6 +42,7 @@ dnstxt.c
 dnsmx.c
 dnsfilter.c
 random-ip.c
+dnsqr.c
 dnsq.c
 dnstrace.c
 utime.c

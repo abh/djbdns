@@ -40,14 +40,17 @@ main(int argc,char **argv)
   init(dir,FATAL);
   makelog(loguser,pw->pw_uid,pw->pw_gid);
 
+  makedir("env");
+  perm(02755);
+  start("env/ROOT"); outs(tinydns); outs("/root\n"); finish();
+  perm(0644);
+  start("env/IP"); outs(myip); outs("\n"); finish();
+  perm(0644);
+
   start("run");
-  outs("#!/bin/sh\nexec 2>&1\n");
-  outs("ROOT="); outs(tinydns); outs("/root; export ROOT\n");
-  outs("exec envuidgid "); outs(user);
-  outs(" \\\nsoftlimit -d250000");
-  outs(" \\\ntcpserver -vDRHl0 -x tcp.cdb -- "); outs(myip); outs(" 53");
-  outs(" \\\n"); outs(auto_home); outs("/bin/axfrdns");
-  outs("\n");
+  outs("#!/bin/sh\nexec 2>&1\nexec envuidgid "); outs(user);
+  outs(" envdir ./env softlimit -d250000 sh -c '\nexec tcpserver -vDRHl0 -x tcp.cdb -- \"$IP\" 53 ");
+  outs(auto_home); outs("/bin/axfrdns\n'\n");
   finish();
   perm(0755);
 

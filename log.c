@@ -278,10 +278,11 @@ void log_rrsoa(char server[4],char *q,char *n1,char *n2,char misc[20],unsigned i
   line();
 }
 
-void log_stats(uint64 *queries,uint64 *motion)
+void log_stats(uint64 *queries,uint64 *motion,int *active)
 {
   string("stats ");
   number(*queries); space();
-  number(*motion);
+  number(*motion); space();
+  number(*active);
   line();
 }

@@ -38,6 +38,7 @@ void hier()
   c(auto_home,"bin","dnsmx",-1,-1,0755);
   c(auto_home,"bin","dnsfilter",-1,-1,0755);
   c(auto_home,"bin","random-ip",-1,-1,0755);
+  c(auto_home,"bin","dnsqr",-1,-1,0755);
   c(auto_home,"bin","dnsq",-1,-1,0755);
   c(auto_home,"bin","dnstrace",-1,-1,0755);
 }

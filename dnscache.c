@@ -73,6 +73,7 @@ static int packetquery(char *buf,unsigned int len,char **q,char qtype[2],char id
 
   pos = dns_packet_copy(buf,len,0,header,12); if (!pos) return 0;
   if (header[2] & 128) return 0; /* must not respond to responses */
+  if (!(header[2] & 1)) return 0; /* do not respond to non-recursive queries */
   if (header[2] & 120) return 0;
   if (header[2] & 2) return 0;
   if (byte_diff(header + 4,2,"\0\1")) return 0;
@@ -299,6 +300,7 @@ static void tcpconnection(void)
   if (x->tcp == -1) return;
   if (x->port < 1024) if (x->port != 53) { close(x->tcp); return; }
   if (!okclient(x->ip)) { close(x->tcp); return; }
+  if (ndelay_on(x->tcp) == -1) { close(x->tcp); return; } /* Linux bug */
 
   ++numtcp;
   x->tcpstate = 1;

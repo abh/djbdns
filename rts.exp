@@ -789,7 +789,7 @@ tinydns-edit: fatal: host name already used
 .test:1.2.3.5:b:3600
 --- dnscache handles dotted-decimal names
 255 127.43.123.234:
-48 bytes, 1+1+0+0 records, response, weird rd, weird ra, noerror
+48 bytes, 1+1+0+0 records, response, noerror
 query: 255 127.43.123.234
 answer: 127.43.123.234 0 A 127.43.123.234
 0

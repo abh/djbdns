@@ -408,6 +408,19 @@ ip4.h iopause.h taia.h tai.h uint64.h printpacket.h stralloc.h \
 gen_alloc.h parsetype.h dns.h stralloc.h iopause.h taia.h
 	./compile dnsq.c
 
+dnsqr: \
+load dnsqr.o iopause.o printrecord.o printpacket.o parsetype.o dns.a \
+env.a libtai.a buffer.a alloc.a unix.a byte.a socket.lib
+	./load dnsqr iopause.o printrecord.o printpacket.o \
+	parsetype.o dns.a env.a libtai.a buffer.a alloc.a unix.a \
+	byte.a  `cat socket.lib`
+
+dnsqr.o: \
+compile dnsqr.c uint16.h strerr.h buffer.h scan.h str.h byte.h \
+error.h iopause.h taia.h tai.h uint64.h printpacket.h stralloc.h \
+gen_alloc.h parsetype.h dns.h stralloc.h iopause.h taia.h
+	./compile dnsqr.c
+
 dnstrace: \
 load dnstrace.o iopause.o printrecord.o parsetype.o dns.a env.a \
 libtai.a alloc.a buffer.a unix.a byte.a socket.lib
@@ -508,7 +521,7 @@ compile instcheck.c strerr.h error.h readwrite.h exit.h
 	./compile instcheck.c
 
 iopause.h: \
-choose compile trypoll.c iopause.h1 iopause.h2
+choose compile load trypoll.c iopause.h1 iopause.h2
 	./choose clr trypoll iopause.h1 iopause.h2 > iopause.h
 
 iopause.o: \
@@ -649,8 +662,8 @@ prog: \
 dnscache-conf dnscache walldns-conf walldns rbldns-conf rbldns \
 rbldns-data pickdns-conf pickdns pickdns-data tinydns-conf tinydns \
 tinydns-data tinydns-get tinydns-edit axfr-get axfrdns-conf axfrdns \
-dnsip dnsipq dnsname dnstxt dnsmx dnsfilter random-ip dnsq dnstrace \
-cachetest utime rts
+dnsip dnsipq dnsname dnstxt dnsmx dnsfilter random-ip dnsqr dnsq \
+dnstrace cachetest utime rts
 
 prot.o: \
 compile prot.c hasshsgr.h prot.h
