@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "dns.h"
 #include "taia.h"
 #include "uint32.h"
@@ -29,7 +30,7 @@ static void surf(void)
   }
 }
 
-void dns_random_init(char data[128])
+void dns_random_init(const char data[128])
 {
   int i;
   struct taia t;

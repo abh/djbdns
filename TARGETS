@@ -18,6 +18,8 @@ buffer_put.o
 strerr_die.o
 strerr_sys.o
 buffer.a
+buffer_read.o
+buffer_write.o
 error.o
 error_str.o
 ndelay_off.o
@@ -197,6 +199,7 @@ dnsq.o
 dnsq
 dnstrace.o
 dnstrace
+dnstracesort
 cachetest.o
 cachetest
 utime.o

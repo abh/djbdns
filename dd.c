@@ -1,7 +1,7 @@
 #include "dns.h"
 #include "dd.h"
 
-int dd(char *q,char *base,char ip[4])
+int dd(const char *q,const char *base,char ip[4])
 {
   int j;
   unsigned int x;

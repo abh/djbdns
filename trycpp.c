@@ -1,4 +1,4 @@
-main()
+int main()
 {
 #ifdef NeXT
   printf("nextstep\n"); exit(0);

@@ -1,7 +1,7 @@
 #include "fmt.h"
 #include "ip4.h"
 
-unsigned int ip4_fmt(char *s,char ip[4])
+unsigned int ip4_fmt(char *s,const char ip[4])
 {
   unsigned int len;
   unsigned int i;

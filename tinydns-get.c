@@ -7,6 +7,7 @@
 #include "strerr.h"
 #include "uint16.h"
 #include "response.h"
+#include "case.h"
 #include "printpacket.h"
 #include "parsetype.h"
 #include "dns.h"
@@ -27,7 +28,7 @@ static char *q;
 
 static stralloc out;
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   uint16 u16;
 

@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "str.h"
 #include "byte.h"
 #include "ip4.h"
@@ -64,12 +65,12 @@ static int doit(char *q,char qtype[2])
   }
 
   if (flaga) {
-    if (!response_rstart(q,DNS_T_A,"\0\0\10\0")) return 0;
+    if (!response_rstart(q,DNS_T_A,2048)) return 0;
     if (!response_addbytes(data,4)) return 0;
     response_rfinish(RESPONSE_ANSWER);
   }
   if (flagtxt) {
-    if (!response_rstart(q,DNS_T_TXT,"\0\0\10\0")) return 0;
+    if (!response_rstart(q,DNS_T_TXT,2048)) return 0;
     ch = dlen - 4;
     if (!response_addbytes(&ch,1)) return 0;
     if (!response_addbytes(data + 4,dlen - 4)) return 0;
@@ -100,7 +101,7 @@ int respond(char *q,char qtype[2],char ip[4])
   return result;
 }
 
-char *fatal = "rbldns: fatal: ";
+const char *fatal = "rbldns: fatal: ";
 
 void initialize(void)
 {

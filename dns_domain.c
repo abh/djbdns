@@ -4,9 +4,9 @@
 #include "byte.h"
 #include "dns.h"
 
-unsigned int dns_domain_length(char *dn)
+unsigned int dns_domain_length(const char *dn)
 {
-  char *x;
+  const char *x;
   unsigned char c;
 
   x = dn;
@@ -23,7 +23,7 @@ void dns_domain_free(char **out)
   }
 }
 
-int dns_domain_copy(char **out,char *in)
+int dns_domain_copy(char **out,const char *in)
 {
   unsigned int len;
   char *x;
@@ -37,7 +37,7 @@ int dns_domain_copy(char **out,char *in)
   return 1;
 }
 
-int dns_domain_equal(char *dn1,char *dn2)
+int dns_domain_equal(const char *dn1,const char *dn2)
 {
   unsigned int len;
 
@@ -48,12 +48,25 @@ int dns_domain_equal(char *dn1,char *dn2)
   return 1;
 }
 
-char *dns_domain_suffix(char *big,char *little)
+int dns_domain_suffix(const char *big,const char *little)
 {
   unsigned char c;
 
   for (;;) {
-    if (dns_domain_equal(big,little)) return big;
+    if (dns_domain_equal(big,little)) return 1;
+    c = *big++;
+    if (!c) return 0;
+    big += c;
+  }
+}
+
+unsigned int dns_domain_suffixpos(const char *big,const char *little)
+{
+  const char *orig = big;
+  unsigned char c;
+
+  for (;;) {
+    if (dns_domain_equal(big,little)) return big - orig;
     c = *big++;
     if (!c) return 0;
     big += c;

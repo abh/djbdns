@@ -1,6 +1,6 @@
 #include "str.h"
 
-int str_start(register char *s,register char *t)
+int str_start(register const char *s,register const char *t)
 {
   register char x;
 

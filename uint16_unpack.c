@@ -1,6 +1,6 @@
 #include "uint16.h"
 
-void uint16_unpack(char s[2],uint16 *u)
+void uint16_unpack(const char s[2],uint16 *u)
 {
   uint16 result;
 
@@ -11,7 +11,7 @@ void uint16_unpack(char s[2],uint16 *u)
   *u = result;
 }
 
-void uint16_unpack_big(char s[2],uint16 *u)
+void uint16_unpack_big(const char s[2],uint16 *u)
 {
   uint16 result;
 

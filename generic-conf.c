@@ -1,18 +1,20 @@
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "strerr.h"
 #include "buffer.h"
-#include "readwrite.h"
 #include "open.h"
 #include "generic-conf.h"
 
-static char *fatal;
-static char *dir;
-static char *fn;
+static const char *fatal;
+static const char *dir;
+static const char *fn;
 
 static int fd;
 static char buf[1024];
 static buffer ss;
 
-void init(char *d,char *f)
+void init(const char *d,const char *f)
 {
   dir = d;
   fatal = f;
@@ -30,26 +32,26 @@ void fail(void)
   strerr_die6sys(111,fatal,"unable to create ",dir,"/",fn,": ");
 }
 
-void makedir(char *s)
+void makedir(const char *s)
 {
   fn = s;
   if (mkdir(fn,0700) == -1) fail();
 }
 
-void start(char *s)
+void start(const char *s)
 {
   fn = s;
   fd = open_trunc(fn);
   if (fd == -1) fail();
-  buffer_init(&ss,write,fd,buf,sizeof buf);
+  buffer_init(&ss,buffer_unixwrite,fd,buf,sizeof buf);
 }
 
-void outs(char *s)
+void outs(const char *s)
 {
   if (buffer_puts(&ss,s) == -1) fail();
 }
 
-void out(char *s,unsigned int len)
+void out(const char *s,unsigned int len)
 {
   if (buffer_put(&ss,s,len) == -1) fail();
 }
@@ -76,7 +78,7 @@ void owner(int uid,int gid)
   if (chown(fn,uid,gid) == -1) fail();
 }
 
-void makelog(char *user,int uid,int gid)
+void makelog(const char *user,int uid,int gid)
 {
   makedir("log");
   perm(02755);

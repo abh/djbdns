@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "taia.h"
 #include "env.h"
 #include "byte.h"
@@ -10,7 +11,7 @@ static stralloc data = {0};
 static int init(stralloc *rules)
 {
   char host[256];
-  char *x;
+  const char *x;
   int i;
   int j;
   int k;

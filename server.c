@@ -71,7 +71,7 @@ static int doit(void)
   return 0;
 }
 
-main()
+int main()
 {
   char *x;
   int udp53;

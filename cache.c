@@ -62,7 +62,7 @@ static uint32 get4(uint32 pos)
   return result;
 }
 
-static unsigned int hash(char *key,unsigned int keylen)
+static unsigned int hash(const char *key,unsigned int keylen)
 {
   unsigned int result = 5381;
 
@@ -77,7 +77,7 @@ static unsigned int hash(char *key,unsigned int keylen)
   return result;
 }
 
-char *cache_get(char *key,unsigned int keylen,unsigned int *datalen)
+char *cache_get(const char *key,unsigned int keylen,unsigned int *datalen,uint32 *ttl)
 {
   struct tai expire;
   struct tai now;
@@ -86,6 +86,7 @@ char *cache_get(char *key,unsigned int keylen,unsigned int *datalen)
   uint32 nextpos;
   uint32 u;
   unsigned int loop;
+  double d;
 
   if (!x) return 0;
   if (keylen > MAXKEYLEN) return 0;
@@ -102,9 +103,15 @@ char *cache_get(char *key,unsigned int keylen,unsigned int *datalen)
         tai_now(&now);
         if (tai_less(&expire,&now)) return 0;
 
+        tai_sub(&expire,&expire,&now);
+        d = tai_approx(&expire);
+        if (d > 604800) d = 604800;
+        *ttl = d;
+
         u = get4(pos + 8);
         if (u > size - pos - 20 - keylen) cache_impossible();
         *datalen = u;
+
         return x + pos + 20 + keylen;
       }
     }
@@ -117,7 +124,7 @@ char *cache_get(char *key,unsigned int keylen,unsigned int *datalen)
   return 0;
 }
 
-void cache_set(char *key,unsigned int keylen,char *data,unsigned int datalen,unsigned int ttl)
+void cache_set(const char *key,unsigned int keylen,const char *data,unsigned int datalen,uint32 ttl)
 {
   struct tai now;
   struct tai expire;

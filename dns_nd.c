@@ -2,7 +2,7 @@
 #include "fmt.h"
 #include "dns.h"
 
-void dns_name4_domain(char name[DNS_NAME4_DOMAIN],char ip[4])
+void dns_name4_domain(char name[DNS_NAME4_DOMAIN],const char ip[4])
 {
   unsigned int namelen;
   unsigned int i;

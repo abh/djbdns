@@ -26,7 +26,7 @@ load auto-str.o buffer.a unix.a byte.a
 	./load auto-str buffer.a unix.a byte.a 
 
 auto-str.o: \
-compile auto-str.c buffer.h readwrite.h exit.h
+compile auto-str.c buffer.h exit.h
 	./compile auto-str.c
 
 auto_home.c: \
@@ -45,9 +45,9 @@ alloc.a buffer.a unix.a byte.a
 
 axfr-get.o: \
 compile axfr-get.c uint32.h uint16.h stralloc.h gen_alloc.h error.h \
-strerr.h getln.h buffer.h stralloc.h buffer.h readwrite.h exit.h \
-open.h scan.h byte.h str.h ip4.h dns.h stralloc.h iopause.h taia.h \
-tai.h uint64.h taia.h
+strerr.h getln.h buffer.h stralloc.h buffer.h exit.h open.h scan.h \
+byte.h str.h ip4.h timeoutread.h timeoutwrite.h dns.h stralloc.h \
+iopause.h taia.h tai.h uint64.h taia.h
 	./compile axfr-get.c
 
 axfrdns: \
@@ -70,10 +70,10 @@ buffer.h
 
 axfrdns.o: \
 compile axfrdns.c droproot.h exit.h env.h uint32.h uint16.h ip4.h \
-tai.h uint64.h buffer.h readwrite.h timeoutread.h timeoutwrite.h \
-open.h seek.h cdb.h uint32.h stralloc.h gen_alloc.h strerr.h str.h \
-byte.h case.h dns.h stralloc.h iopause.h taia.h tai.h taia.h \
-response.h
+tai.h uint64.h buffer.h timeoutread.h timeoutwrite.h open.h seek.h \
+cdb.h uint32.h stralloc.h gen_alloc.h strerr.h str.h byte.h case.h \
+dns.h stralloc.h iopause.h taia.h tai.h taia.h scan.h qlog.h uint16.h \
+response.h uint32.h
 	./compile axfrdns.c
 
 buffer.a: \
@@ -88,11 +88,11 @@ compile buffer.c buffer.h
 	./compile buffer.c
 
 buffer_1.o: \
-compile buffer_1.c readwrite.h buffer.h
+compile buffer_1.c buffer.h
 	./compile buffer_1.c
 
 buffer_2.o: \
-compile buffer_2.c readwrite.h buffer.h
+compile buffer_2.c buffer.h
 	./compile buffer_2.c
 
 buffer_copy.o: \
@@ -106,6 +106,14 @@ compile buffer_get.c buffer.h byte.h error.h
 buffer_put.o: \
 compile buffer_put.c buffer.h str.h byte.h error.h
 	./compile buffer_put.c
+
+buffer_read.o: \
+compile buffer_read.c buffer.h
+	./compile buffer_read.c
+
+buffer_write.o: \
+compile buffer_write.c buffer.h
+	./compile buffer_write.c
 
 byte.a: \
 makelib byte_chr.o byte_copy.o byte_cr.o byte_diff.o byte_zero.o \
@@ -141,7 +149,7 @@ compile byte_zero.c byte.h
 
 cache.o: \
 compile cache.c alloc.h byte.h uint32.h exit.h tai.h uint64.h cache.h \
-uint64.h
+uint32.h uint64.h
 	./compile cache.c
 
 cachetest: \
@@ -150,7 +158,7 @@ load cachetest.o cache.o libtai.a buffer.a alloc.a unix.a byte.a
 	byte.a 
 
 cachetest.o: \
-compile cachetest.c buffer.h exit.h cache.h uint64.h str.h
+compile cachetest.c buffer.h exit.h cache.h uint32.h uint64.h str.h
 	./compile cachetest.c
 
 case_diffb.o: \
@@ -170,7 +178,7 @@ makelib cdb.o cdb_hash.o cdb_make.o
 	./makelib cdb.a cdb.o cdb_hash.o cdb_make.o
 
 cdb.o: \
-compile cdb.c readwrite.h error.h seek.h byte.h cdb.h uint32.h
+compile cdb.c error.h seek.h byte.h cdb.h uint32.h
 	./compile cdb.c
 
 cdb_hash.o: \
@@ -178,8 +186,8 @@ compile cdb_hash.c cdb.h uint32.h
 	./compile cdb_hash.c
 
 cdb_make.o: \
-compile cdb_make.c readwrite.h seek.h error.h alloc.h cdb.h uint32.h \
-cdb_make.h buffer.h uint32.h
+compile cdb_make.c seek.h error.h alloc.h cdb.h uint32.h cdb_make.h \
+buffer.h uint32.h
 	./compile cdb_make.c
 
 check: \
@@ -300,8 +308,8 @@ taia.h tai.h uint64.h taia.h
 
 dns_transmit.o: \
 compile dns_transmit.c socket.h uint16.h alloc.h error.h byte.h \
-readwrite.h uint16.h dns.h stralloc.h gen_alloc.h iopause.h taia.h \
-tai.h uint64.h taia.h
+uint16.h dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h \
+taia.h
 	./compile dns_transmit.c
 
 dns_txt.o: \
@@ -326,16 +334,16 @@ unix.a byte.a
 
 dnscache-conf.o: \
 compile dnscache-conf.c hasdevtcp.h strerr.h buffer.h uint32.h taia.h \
-tai.h uint64.h str.h open.h readwrite.h exit.h auto_home.h \
-generic-conf.h buffer.h
+tai.h uint64.h str.h open.h error.h exit.h auto_home.h generic-conf.h \
+buffer.h
 	./compile dnscache-conf.c
 
 dnscache.o: \
 compile dnscache.c env.h exit.h scan.h strerr.h error.h ip4.h \
-uint16.h socket.h uint16.h dns.h stralloc.h gen_alloc.h iopause.h \
-taia.h tai.h uint64.h taia.h byte.h roots.h fmt.h iopause.h query.h \
-dns.h alloc.h response.h cache.h uint64.h log.h uint64.h readwrite.h \
-okclient.h droproot.h
+uint16.h uint64.h socket.h uint16.h dns.h stralloc.h gen_alloc.h \
+iopause.h taia.h tai.h uint64.h taia.h taia.h byte.h roots.h fmt.h \
+iopause.h query.h dns.h uint32.h alloc.h response.h uint32.h cache.h \
+uint32.h uint64.h ndelay.h log.h uint64.h okclient.h droproot.h
 	./compile dnscache.c
 
 dnsfilter: \
@@ -347,8 +355,7 @@ buffer.a unix.a byte.a socket.lib
 dnsfilter.o: \
 compile dnsfilter.c strerr.h buffer.h stralloc.h gen_alloc.h alloc.h \
 dns.h stralloc.h iopause.h taia.h tai.h uint64.h taia.h ip4.h byte.h \
-scan.h taia.h sgetopt.h subgetopt.h iopause.h error.h readwrite.h \
-exit.h
+scan.h taia.h sgetopt.h subgetopt.h iopause.h error.h exit.h
 	./compile dnsfilter.c
 
 dnsip: \
@@ -380,8 +387,8 @@ byte.a socket.lib
 	buffer.a unix.a byte.a  `cat socket.lib`
 
 dnsmx.o: \
-compile dnsmx.c buffer.h exit.h strerr.h uint16.h byte.h fmt.h dns.h \
-stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h
+compile dnsmx.c buffer.h exit.h strerr.h uint16.h byte.h str.h fmt.h \
+dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h
 	./compile dnsmx.c
 
 dnsname: \
@@ -422,18 +429,25 @@ gen_alloc.h parsetype.h dns.h stralloc.h iopause.h taia.h
 	./compile dnsqr.c
 
 dnstrace: \
-load dnstrace.o iopause.o printrecord.o parsetype.o dns.a env.a \
+load dnstrace.o dd.o iopause.o printrecord.o parsetype.o dns.a env.a \
 libtai.a alloc.a buffer.a unix.a byte.a socket.lib
-	./load dnstrace iopause.o printrecord.o parsetype.o dns.a \
-	env.a libtai.a alloc.a buffer.a unix.a byte.a  `cat \
+	./load dnstrace dd.o iopause.o printrecord.o parsetype.o \
+	dns.a env.a libtai.a alloc.a buffer.a unix.a byte.a  `cat \
 	socket.lib`
 
 dnstrace.o: \
 compile dnstrace.c uint16.h uint32.h fmt.h str.h byte.h ip4.h \
 gen_alloc.h gen_allocdefs.h exit.h buffer.h stralloc.h gen_alloc.h \
 error.h strerr.h iopause.h taia.h tai.h uint64.h printrecord.h \
-stralloc.h parsetype.h dns.h stralloc.h iopause.h taia.h
+stralloc.h alloc.h parsetype.h dd.h dns.h stralloc.h iopause.h taia.h
 	./compile dnstrace.c
+
+dnstracesort: \
+warn-auto.sh dnstracesort.sh conf-home
+	cat warn-auto.sh dnstracesort.sh \
+	| sed s}HOME}"`head -1 conf-home`"}g \
+	> dnstracesort
+	chmod 755 dnstracesort
 
 dnstxt: \
 load dnstxt.o iopause.o dns.a env.a libtai.a alloc.a buffer.a unix.a \
@@ -471,8 +485,8 @@ compile fmt_ulong.c fmt.h
 	./compile fmt_ulong.c
 
 generic-conf.o: \
-compile generic-conf.c strerr.h buffer.h readwrite.h open.h \
-generic-conf.h buffer.h
+compile generic-conf.c strerr.h buffer.h open.h generic-conf.h \
+buffer.h
 	./compile generic-conf.c
 
 getln.o: \
@@ -509,7 +523,7 @@ load install.o hier.o auto_home.o buffer.a unix.a byte.a
 	./load install hier.o auto_home.o buffer.a unix.a byte.a 
 
 install.o: \
-compile install.c buffer.h strerr.h error.h open.h readwrite.h exit.h
+compile install.c buffer.h strerr.h error.h open.h exit.h
 	./compile install.c
 
 instcheck: \
@@ -517,7 +531,7 @@ load instcheck.o hier.o auto_home.o buffer.a unix.a byte.a
 	./load instcheck hier.o auto_home.o buffer.a unix.a byte.a 
 
 instcheck.o: \
-compile instcheck.c strerr.h error.h readwrite.h exit.h
+compile instcheck.c strerr.h error.h exit.h
 	./compile instcheck.c
 
 iopause.h: \
@@ -608,7 +622,7 @@ gen_alloc.h openreadclose.h stralloc.h
 
 parsetype.o: \
 compile parsetype.c scan.h byte.h case.h dns.h stralloc.h gen_alloc.h \
-iopause.h taia.h tai.h uint64.h taia.h parsetype.h
+iopause.h taia.h tai.h uint64.h taia.h uint16.h parsetype.h
 	./compile parsetype.c
 
 pickdns: \
@@ -634,22 +648,22 @@ load pickdns-data.o cdb.a dns.a alloc.a buffer.a unix.a byte.a
 	byte.a 
 
 pickdns-data.o: \
-compile pickdns-data.c buffer.h readwrite.h exit.h cdb_make.h \
-buffer.h uint32.h open.h alloc.h gen_allocdefs.h stralloc.h \
-gen_alloc.h getln.h buffer.h stralloc.h strerr.h str.h byte.h scan.h \
-fmt.h ip4.h dns.h stralloc.h iopause.h taia.h tai.h uint64.h taia.h
+compile pickdns-data.c buffer.h exit.h cdb_make.h buffer.h uint32.h \
+open.h alloc.h gen_allocdefs.h stralloc.h gen_alloc.h getln.h \
+buffer.h stralloc.h case.h strerr.h str.h byte.h scan.h fmt.h ip4.h \
+dns.h stralloc.h iopause.h taia.h tai.h uint64.h taia.h
 	./compile pickdns-data.c
 
 pickdns.o: \
 compile pickdns.c byte.h case.h dns.h stralloc.h gen_alloc.h \
 iopause.h taia.h tai.h uint64.h taia.h open.h cdb.h uint32.h \
-response.h
+response.h uint32.h
 	./compile pickdns.c
 
 printpacket.o: \
 compile printpacket.c uint16.h uint32.h error.h byte.h dns.h \
 stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h \
-printpacket.h stralloc.h
+printrecord.h stralloc.h printpacket.h stralloc.h
 	./compile printpacket.c
 
 printrecord.o: \
@@ -663,7 +677,7 @@ dnscache-conf dnscache walldns-conf walldns rbldns-conf rbldns \
 rbldns-data pickdns-conf pickdns pickdns-data tinydns-conf tinydns \
 tinydns-data tinydns-get tinydns-edit axfr-get axfrdns-conf axfrdns \
 dnsip dnsipq dnsname dnstxt dnsmx dnsfilter random-ip dnsqr dnsq \
-dnstrace cachetest utime rts
+dnstrace dnstracesort cachetest utime rts
 
 prot.o: \
 compile prot.c hasshsgr.h prot.h
@@ -675,9 +689,9 @@ compile qlog.c buffer.h qlog.h uint16.h
 
 query.o: \
 compile query.c error.h roots.h log.h uint64.h case.h cache.h \
-uint64.h byte.h dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h \
-uint64.h taia.h uint64.h uint32.h uint16.h dd.h alloc.h response.h \
-query.h dns.h
+uint32.h uint64.h byte.h dns.h stralloc.h gen_alloc.h iopause.h \
+taia.h tai.h uint64.h taia.h uint64.h uint32.h uint16.h dd.h alloc.h \
+response.h uint32.h query.h dns.h uint32.h
 	./compile query.c
 
 random-ip: \
@@ -711,31 +725,30 @@ load rbldns-data.o cdb.a alloc.a buffer.a unix.a byte.a
 	./load rbldns-data cdb.a alloc.a buffer.a unix.a byte.a 
 
 rbldns-data.o: \
-compile rbldns-data.c buffer.h readwrite.h exit.h cdb_make.h buffer.h \
-uint32.h open.h stralloc.h gen_alloc.h getln.h buffer.h stralloc.h \
-strerr.h byte.h scan.h fmt.h ip4.h
+compile rbldns-data.c buffer.h exit.h cdb_make.h buffer.h uint32.h \
+open.h stralloc.h gen_alloc.h getln.h buffer.h stralloc.h strerr.h \
+byte.h scan.h fmt.h ip4.h
 	./compile rbldns-data.c
 
 rbldns.o: \
 compile rbldns.c str.h byte.h ip4.h open.h env.h cdb.h uint32.h dns.h \
 stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h dd.h \
-strerr.h response.h
+strerr.h response.h uint32.h
 	./compile rbldns.c
 
 readclose.o: \
-compile readclose.c readwrite.h error.h readclose.h stralloc.h \
-gen_alloc.h
+compile readclose.c error.h readclose.h stralloc.h gen_alloc.h
 	./compile readclose.c
 
 response.o: \
 compile response.c dns.h stralloc.h gen_alloc.h iopause.h taia.h \
-tai.h uint64.h taia.h byte.h uint16.h response.h
+tai.h uint64.h taia.h byte.h uint16.h response.h uint32.h
 	./compile response.c
 
 roots.o: \
-compile roots.c open.h error.h str.h byte.h readwrite.h error.h \
-direntry.h ip4.h dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h \
-uint64.h taia.h openreadclose.h stralloc.h roots.h
+compile roots.c open.h error.h str.h byte.h error.h direntry.h ip4.h \
+dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h \
+openreadclose.h stralloc.h roots.h
 	./compile roots.c
 
 rts: \
@@ -759,8 +772,8 @@ choose compile trysysel.c select.h1 select.h2
 
 server.o: \
 compile server.c byte.h case.h env.h strerr.h ip4.h uint16.h ndelay.h \
-socket.h uint16.h droproot.h qlog.h uint16.h response.h dns.h \
-stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h
+socket.h uint16.h droproot.h qlog.h uint16.h response.h uint32.h \
+dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h
 	./compile server.c
 
 setup: \
@@ -787,7 +800,7 @@ compile socket_bind.c byte.h socket.h uint16.h
 	./compile socket_bind.c
 
 socket_conn.o: \
-compile socket_conn.c readwrite.h byte.h socket.h uint16.h
+compile socket_conn.c byte.h socket.h uint16.h
 	./compile socket_conn.c
 
 socket_listen.o: \
@@ -951,17 +964,17 @@ compile taia_uint.c taia.h tai.h uint64.h
 tdlookup.o: \
 compile tdlookup.c uint16.h open.h tai.h uint64.h cdb.h uint32.h \
 byte.h case.h dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h \
-taia.h seek.h response.h
+taia.h seek.h response.h uint32.h
 	./compile tdlookup.c
 
 timeoutread.o: \
 compile timeoutread.c error.h iopause.h taia.h tai.h uint64.h \
-readwrite.h timeoutread.h
+timeoutread.h
 	./compile timeoutread.c
 
 timeoutwrite.o: \
 compile timeoutwrite.c error.h iopause.h taia.h tai.h uint64.h \
-readwrite.h timeoutwrite.h
+timeoutwrite.h
 	./compile timeoutwrite.c
 
 tinydns: \
@@ -989,7 +1002,7 @@ load tinydns-data.o cdb.a dns.a alloc.a buffer.a unix.a byte.a
 
 tinydns-data.o: \
 compile tinydns-data.c uint16.h uint32.h str.h byte.h fmt.h ip4.h \
-exit.h readwrite.h buffer.h strerr.h getln.h buffer.h stralloc.h \
+exit.h case.h scan.h buffer.h strerr.h getln.h buffer.h stralloc.h \
 gen_alloc.h cdb_make.h buffer.h uint32.h stralloc.h open.h dns.h \
 stralloc.h iopause.h taia.h tai.h uint64.h taia.h
 	./compile tinydns-data.c
@@ -999,9 +1012,9 @@ load tinydns-edit.o dns.a alloc.a buffer.a unix.a byte.a
 	./load tinydns-edit dns.a alloc.a buffer.a unix.a byte.a 
 
 tinydns-edit.o: \
-compile tinydns-edit.c stralloc.h gen_alloc.h buffer.h readwrite.h \
-exit.h getln.h buffer.h stralloc.h strerr.h scan.h byte.h str.h fmt.h \
-ip4.h dns.h stralloc.h iopause.h taia.h tai.h uint64.h taia.h
+compile tinydns-edit.c stralloc.h gen_alloc.h buffer.h exit.h open.h \
+getln.h buffer.h stralloc.h strerr.h scan.h byte.h str.h fmt.h ip4.h \
+dns.h stralloc.h iopause.h taia.h tai.h uint64.h taia.h
 	./compile tinydns-edit.c
 
 tinydns-get: \
@@ -1013,9 +1026,9 @@ parsetype.o libtai.a cdb.a dns.a buffer.a alloc.a unix.a byte.a
 
 tinydns-get.o: \
 compile tinydns-get.c str.h byte.h scan.h exit.h stralloc.h \
-gen_alloc.h buffer.h strerr.h uint16.h response.h printpacket.h \
-stralloc.h parsetype.h dns.h stralloc.h iopause.h taia.h tai.h \
-uint64.h taia.h
+gen_alloc.h buffer.h strerr.h uint16.h response.h uint32.h case.h \
+printpacket.h stralloc.h parsetype.h dns.h stralloc.h iopause.h \
+taia.h tai.h uint64.h taia.h
 	./compile tinydns-get.c
 
 tinydns.o: \
@@ -1053,12 +1066,12 @@ unix.a: \
 makelib error.o error_str.o ndelay_off.o ndelay_on.o open_read.o \
 open_trunc.o openreadclose.o readclose.o seek_set.o socket_accept.o \
 socket_bind.o socket_conn.o socket_listen.o socket_recv.o \
-socket_send.o socket_tcp.o socket_udp.o
+socket_send.o socket_tcp.o socket_udp.o buffer_read.o buffer_write.o
 	./makelib unix.a error.o error_str.o ndelay_off.o \
 	ndelay_on.o open_read.o open_trunc.o openreadclose.o \
 	readclose.o seek_set.o socket_accept.o socket_bind.o \
 	socket_conn.o socket_listen.o socket_recv.o socket_send.o \
-	socket_tcp.o socket_udp.o
+	socket_tcp.o socket_udp.o buffer_read.o buffer_write.o
 
 utime: \
 load utime.o byte.a
@@ -1087,5 +1100,5 @@ buffer.h
 
 walldns.o: \
 compile walldns.c byte.h dns.h stralloc.h gen_alloc.h iopause.h \
-taia.h tai.h uint64.h taia.h dd.h response.h
+taia.h tai.h uint64.h taia.h dd.h response.h uint32.h
 	./compile walldns.c

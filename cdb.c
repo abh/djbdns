@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include "readwrite.h"
+#include <unistd.h>
 #include "error.h"
 #include "seek.h"
 #include "byte.h"
@@ -67,7 +67,7 @@ int cdb_read(struct cdb *c,char *buf,unsigned int len,uint32 pos)
   return -1;
 }
 
-static int match(struct cdb *c,char *key,unsigned int len,uint32 pos)
+static int match(struct cdb *c,const char *key,unsigned int len,uint32 pos)
 {
   char buf[32];
   int n;
@@ -84,7 +84,7 @@ static int match(struct cdb *c,char *key,unsigned int len,uint32 pos)
   return 1;
 }
 
-int cdb_findnext(struct cdb *c,char *key,unsigned int len)
+int cdb_findnext(struct cdb *c,const char *key,unsigned int len)
 {
   char buf[8];
   uint32 pos;
@@ -129,7 +129,7 @@ int cdb_findnext(struct cdb *c,char *key,unsigned int len)
   return 0;
 }
 
-int cdb_find(struct cdb *c,char *key,unsigned int len)
+int cdb_find(struct cdb *c,const char *key,unsigned int len)
 {
   cdb_findstart(c);
   return cdb_findnext(c,key,len);

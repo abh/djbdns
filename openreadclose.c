@@ -3,7 +3,7 @@
 #include "readclose.h"
 #include "openreadclose.h"
 
-int openreadclose(char *fn,stralloc *sa,unsigned int bufsize)
+int openreadclose(const char *fn,stralloc *sa,unsigned int bufsize)
 {
   int fd;
   fd = open_read(fn);

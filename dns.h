@@ -34,51 +34,51 @@ struct dns_transmit {
   unsigned int curserver;
   struct taia deadline;
   unsigned int pos;
-  char *servers;
+  const char *servers;
   char localip[4];
   char qtype[2];
 } ;
 
-extern void dns_random_init(char *);
+extern void dns_random_init(const char *);
 extern unsigned int dns_random(unsigned int);
 
 extern void dns_sortip(char *,unsigned int);
 
 extern void dns_domain_free(char **);
-extern int dns_domain_copy(char **,char *);
-extern unsigned int dns_domain_length(char *);
-extern int dns_domain_equal(char *,char *);
-extern char *dns_domain_suffix(char *,char *);
-extern int dns_domain_fromdot(char **,char *,unsigned int);
-extern int dns_domain_todot_cat(stralloc *,char *);
+extern int dns_domain_copy(char **,const char *);
+extern unsigned int dns_domain_length(const char *);
+extern int dns_domain_equal(const char *,const char *);
+extern int dns_domain_suffix(const char *,const char *);
+extern unsigned int dns_domain_suffixpos(const char *,const char *);
+extern int dns_domain_fromdot(char **,const char *,unsigned int);
+extern int dns_domain_todot_cat(stralloc *,const char *);
 
-extern unsigned int dns_packet_copy(char *,unsigned int,unsigned int,char *,unsigned int);
-extern unsigned int dns_packet_getname(char *,unsigned int,unsigned int,char **);
-extern unsigned int dns_packet_skipname(char *,unsigned int,unsigned int);
-extern int dns_packet_nameequal(char *,unsigned int,unsigned int,char *,unsigned int,unsigned int);
+extern unsigned int dns_packet_copy(const char *,unsigned int,unsigned int,char *,unsigned int);
+extern unsigned int dns_packet_getname(const char *,unsigned int,unsigned int,char **);
+extern unsigned int dns_packet_skipname(const char *,unsigned int,unsigned int);
 
-extern int dns_transmit_start(struct dns_transmit *,char *,int,char *,char *,char *);
+extern int dns_transmit_start(struct dns_transmit *,const char *,int,const char *,const char *,const char *);
 extern void dns_transmit_free(struct dns_transmit *);
 extern void dns_transmit_io(struct dns_transmit *,iopause_fd *,struct taia *);
-extern int dns_transmit_get(struct dns_transmit *,iopause_fd *,struct taia *);
+extern int dns_transmit_get(struct dns_transmit *,const iopause_fd *,const struct taia *);
 
 extern int dns_resolvconfip(char *);
-extern int dns_resolve(char *,char *);
+extern int dns_resolve(const char *,const char *);
 extern struct dns_transmit dns_resolve_tx;
 
-extern int dns_ip4_packet(stralloc *,char *,unsigned int);
-extern int dns_ip4(stralloc *,stralloc *);
-extern int dns_name_packet(stralloc *,char *,unsigned int);
-extern void dns_name4_domain(char *,char *);
+extern int dns_ip4_packet(stralloc *,const char *,unsigned int);
+extern int dns_ip4(stralloc *,const stralloc *);
+extern int dns_name_packet(stralloc *,const char *,unsigned int);
+extern void dns_name4_domain(char *,const char *);
 #define DNS_NAME4_DOMAIN 31
-extern int dns_name4(stralloc *,char *);
-extern int dns_txt_packet(stralloc *,char *,unsigned int);
-extern int dns_txt(stralloc *,stralloc *);
-extern int dns_mx_packet(stralloc *,char *,unsigned int);
-extern int dns_mx(stralloc *,stralloc *);
+extern int dns_name4(stralloc *,const char *);
+extern int dns_txt_packet(stralloc *,const char *,unsigned int);
+extern int dns_txt(stralloc *,const stralloc *);
+extern int dns_mx_packet(stralloc *,const char *,unsigned int);
+extern int dns_mx(stralloc *,const stralloc *);
 
 extern int dns_resolvconfrewrite(stralloc *);
-extern int dns_ip4_qualify_rules(stralloc *,stralloc *,stralloc *,stralloc *);
-extern int dns_ip4_qualify(stralloc *,stralloc *,stralloc *);
+extern int dns_ip4_qualify_rules(stralloc *,stralloc *,const stralloc *,const stralloc *);
+extern int dns_ip4_qualify(stralloc *,stralloc *,const stralloc *);
 
 #endif

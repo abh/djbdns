@@ -23,12 +23,12 @@ Documentation in sgetopt.3.
 #define optprogname sgetoptprogname
 
 int opterr = 1;
-char *optprogname = 0;
+const char *optprogname = 0;
 
-int getopt(int argc,char **argv,char *opts)
+int getopt(int argc,char **argv,const char *opts)
 {
   int c;
-  char *s;
+  const char *s;
 
   if (!optprogname) {
     optprogname = *argv;

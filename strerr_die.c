@@ -2,7 +2,7 @@
 #include "exit.h"
 #include "strerr.h"
 
-void strerr_warn(char *x1,char *x2,char *x3,char *x4,char *x5,char *x6,struct strerr *se)
+void strerr_warn(const char *x1,const char *x2,const char *x3,const char *x4,const char *x5,const char *x6,const struct strerr *se)
 {
   strerr_sysinit();
  
@@ -24,7 +24,7 @@ void strerr_warn(char *x1,char *x2,char *x3,char *x4,char *x5,char *x6,struct st
   buffer_flush(buffer_2);
 }
 
-void strerr_die(int e,char *x1,char *x2,char *x3,char *x4,char *x5,char *x6,struct strerr *se)
+void strerr_die(int e,const char *x1,const char *x2,const char *x3,const char *x4,const char *x5,const char *x6,const struct strerr *se)
 {
   strerr_warn(x1,x2,x3,x4,x5,x6,se);
   _exit(e);

@@ -3,6 +3,7 @@
 #include "error.h"
 #include "byte.h"
 #include "dns.h"
+#include "printrecord.h"
 #include "printpacket.h"
 
 static char *d;

@@ -3,7 +3,7 @@
 #include "dd.h"
 #include "response.h"
 
-char *fatal = "walldns: fatal: ";
+const char *fatal = "walldns: fatal: ";
 
 void initialize(void)
 {
@@ -24,7 +24,7 @@ int respond(char *q,char qtype[2])
   if (flaga || flagptr) {
     if (dd(q,"",ip) == 4) {
       if (flaga) {
-        if (!response_rstart(q,DNS_T_A,"\0\12\0\0")) return 0;
+        if (!response_rstart(q,DNS_T_A,655360)) return 0;
         if (!response_addbytes(ip,4)) return 0;
         response_rfinish(RESPONSE_ANSWER);
       }
@@ -33,7 +33,7 @@ int respond(char *q,char qtype[2])
     j = dd(q,"\7in-addr\4arpa",ip);
     if (j >= 0) {
       if (flaga && (j == 4)) {
-        if (!response_rstart(q,DNS_T_A,"\0\12\0\0")) return 0;
+        if (!response_rstart(q,DNS_T_A,655360)) return 0;
         if (!response_addbytes(ip + 3,1)) return 0;
         if (!response_addbytes(ip + 2,1)) return 0;
         if (!response_addbytes(ip + 1,1)) return 0;
@@ -41,7 +41,7 @@ int respond(char *q,char qtype[2])
         response_rfinish(RESPONSE_ANSWER);
       }
       if (flagptr) {
-        if (!response_rstart(q,DNS_T_PTR,"\0\12\0\0")) return 0;
+        if (!response_rstart(q,DNS_T_PTR,655360)) return 0;
         if (!response_addname(q)) return 0;
         response_rfinish(RESPONSE_ANSWER);
       }

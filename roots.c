@@ -1,8 +1,8 @@
+#include <unistd.h>
 #include "open.h"
 #include "error.h"
 #include "str.h"
 #include "byte.h"
-#include "readwrite.h"
 #include "error.h"
 #include "direntry.h"
 #include "ip4.h"
@@ -57,7 +57,7 @@ int roots_same(char *q,char *q2)
 static int init2(DIR *dir)
 {
   direntry *d;
-  char *fqdn;
+  const char *fqdn;
   static char *q;
   static stralloc text;
   char servers[64];

@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <pwd.h>
 #include "strerr.h"
 #include "exit.h"
@@ -17,7 +18,7 @@ char *loguser;
 struct passwd *pw;
 char *myip;
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   user = argv[1];
   if (!user) usage();
@@ -45,7 +46,7 @@ main(int argc,char **argv)
 
   start("run");
   outs("#!/bin/sh\nexec 2>&1\nexec envuidgid "); outs(user);
-  outs(" envdir ./env softlimit -d250000 ");
+  outs(" envdir ./env softlimit -d300000 ");
   outs(auto_home); outs("/bin/tinydns\n");
   finish();
   perm(0755);

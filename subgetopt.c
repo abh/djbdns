@@ -14,10 +14,10 @@ char *optarg = 0;
 int optproblem = 0;
 int optdone = SUBGETOPTDONE;
 
-int sgopt(int argc,char **argv,char *opts)
+int sgopt(int argc,char **argv,const char *opts)
 {
   int c;
-  char *s;
+  const char *s;
 
   optarg = 0;
   if (!argv || (optind >= argc) || !argv[optind]) return optdone;

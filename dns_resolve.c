@@ -5,7 +5,7 @@
 
 struct dns_transmit dns_resolve_tx = {0};
 
-int dns_resolve(char *q,char qtype[2])
+int dns_resolve(const char *q,const char qtype[2])
 {
   struct taia stamp;
   struct taia deadline;

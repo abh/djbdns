@@ -10,7 +10,7 @@ static char seed[128];
 static stralloc fqdn;
 static stralloc out;
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   dns_random_init(seed);
 

@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "uint16.h"
 #include "open.h"
 #include "tai.h"
@@ -8,7 +9,7 @@
 #include "seek.h"
 #include "response.h"
 
-static int want(char *owner,char type[2])
+static int want(const char *owner,const char type[2])
 {
   unsigned int pos;
   static char *d;
@@ -34,11 +35,11 @@ static char *d1;
 
 static struct tai now;
 static struct cdb c;
-static char data[512];
+static char data[32767];
 static uint32 dlen;
 static unsigned int dpos;
 static char type[2];
-static char ttl[4];
+static uint32 ttl;
 
 static int find(char *d,int flagwild)
 {
@@ -46,6 +47,7 @@ static int find(char *d,int flagwild)
   char ch;
   struct tai cutoff;
   char ttd[8];
+  char ttlstr[4];
   double newttl;
 
   for (;;) {
@@ -57,17 +59,18 @@ static int find(char *d,int flagwild)
     dpos = dns_packet_copy(data,dlen,0,type,2); if (!dpos) return -1;
     dpos = dns_packet_copy(data,dlen,dpos,&ch,1); if (!dpos) return -1;
     if (flagwild != (ch == '*')) continue;
-    dpos = dns_packet_copy(data,dlen,dpos,ttl,4); if (!dpos) return -1;
+    dpos = dns_packet_copy(data,dlen,dpos,ttlstr,4); if (!dpos) return -1;
+    uint32_unpack_big(ttlstr,&ttl);
     dpos = dns_packet_copy(data,dlen,dpos,ttd,8); if (!dpos) return -1;
     if (byte_diff(ttd,8,"\0\0\0\0\0\0\0\0")) {
       tai_unpack(ttd,&cutoff);
-      if (byte_equal(ttl,4,"\0\0\0\0")) {
+      if (ttl == 0) {
 	if (tai_less(&cutoff,&now)) continue;
 	tai_sub(&cutoff,&cutoff,&now);
 	newttl = tai_approx(&cutoff);
 	if (newttl <= 2.0) newttl = 2.0;
 	if (newttl >= 3600.0) newttl = 3600.0;
-	uint32_pack_big(ttl,(uint32) newttl);
+	ttl = newttl;
       }
       else
 	if (!tai_less(&cutoff,&now)) continue;

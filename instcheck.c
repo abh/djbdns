@@ -1,8 +1,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "strerr.h"
 #include "error.h"
-#include "readwrite.h"
 #include "exit.h"
 
 extern void hier();
@@ -101,7 +101,7 @@ int mode;
   perm("",home,"/",file,S_IFREG,uid,gid,mode);
 }
 
-main()
+int main()
 {
   hier();
   _exit(0);

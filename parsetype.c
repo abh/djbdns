@@ -2,6 +2,7 @@
 #include "byte.h"
 #include "case.h"
 #include "dns.h"
+#include "uint16.h"
 #include "parsetype.h"
 
 int parsetype(char *s,char type[2])

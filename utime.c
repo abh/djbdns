@@ -9,7 +9,7 @@ char *ustr;
 unsigned long u;
 time_t ut[2];
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   fn = argv[1];
   if (!fn) _exit(100);

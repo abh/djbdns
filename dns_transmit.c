@@ -1,12 +1,14 @@
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #include "socket.h"
 #include "alloc.h"
 #include "error.h"
 #include "byte.h"
-#include "readwrite.h"
 #include "uint16.h"
 #include "dns.h"
 
-static int serverwantstcp(char *buf,unsigned int len)
+static int serverwantstcp(const char *buf,unsigned int len)
 {
   char out[12];
 
@@ -15,7 +17,7 @@ static int serverwantstcp(char *buf,unsigned int len)
   return 0;
 }
 
-static int serverfailed(char *buf,unsigned int len)
+static int serverfailed(const char *buf,unsigned int len)
 {
   char out[12];
   unsigned int rcode;
@@ -27,7 +29,7 @@ static int serverfailed(char *buf,unsigned int len)
   return 0;
 }
 
-static int irrelevant(struct dns_transmit *d,char *buf,unsigned int len)
+static int irrelevant(const struct dns_transmit *d,const char *buf,unsigned int len)
 {
   char out[12];
   char *dn;
@@ -94,7 +96,7 @@ static const int timeouts[4] = { 1, 3, 11, 45 };
 
 static int thisudp(struct dns_transmit *d)
 {
-  char *ip;
+  const char *ip;
 
   socketfree(d);
 
@@ -145,7 +147,7 @@ static int nextudp(struct dns_transmit *d)
 static int thistcp(struct dns_transmit *d)
 {
   struct taia now;
-  char *ip;
+  const char *ip;
 
   socketfree(d);
   packetfree(d);
@@ -191,7 +193,7 @@ static int nexttcp(struct dns_transmit *d)
   return thistcp(d);
 }
 
-int dns_transmit_start(struct dns_transmit *d,char servers[64],int flagrecursive,char *q,char qtype[2],char localip[4])
+int dns_transmit_start(struct dns_transmit *d,const char servers[64],int flagrecursive,const char *q,const char qtype[2],const char localip[4])
 {
   unsigned int len;
 
@@ -236,7 +238,7 @@ void dns_transmit_io(struct dns_transmit *d,iopause_fd *x,struct taia *deadline)
     *deadline = d->deadline;
 }
 
-int dns_transmit_get(struct dns_transmit *d,iopause_fd *x,struct taia *when)
+int dns_transmit_get(struct dns_transmit *d,const iopause_fd *x,const struct taia *when)
 {
   char udpbuf[513];
   unsigned char ch;

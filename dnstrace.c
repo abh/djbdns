@@ -13,11 +13,12 @@
 #include "strerr.h"
 #include "iopause.h"
 #include "printrecord.h"
+#include "alloc.h"
 #include "parsetype.h"
+#include "dd.h"
 #include "dns.h"
 
 #define FATAL "dnstrace: fatal: "
-#define ALERT "\tA\10AL\10LE\10ER\10RT\10T:\10: "
 
 void nomem(void)
 {
@@ -28,31 +29,15 @@ void usage(void)
   strerr_die1x(100,"dnstrace: usage: dnstrace type name rootip ...");
 }
 
+static stralloc querystr;
 char ipstr[IP4_FMT];
-char strnum[FMT_ULONG];
 static stralloc tmp;
 
-void printtype(char type[2])
-{
-  uint16 u16;
-  uint16_unpack_big(type,&u16);
-  buffer_put(buffer_1,strnum,fmt_ulong(strnum,u16));
-}
-void printdomain(char *d)
+void printdomain(const char *d)
 {
   if (!stralloc_copys(&tmp,"")) nomem();
   if (!dns_domain_todot_cat(&tmp,d)) nomem();
   buffer_put(buffer_1,tmp.s,tmp.len);
-}
-void printcontrol(char *d)
-{
-  int i;
-  if (!stralloc_copys(&tmp,"")) nomem();
-  if (!dns_domain_todot_cat(&tmp,d)) nomem();
-  for (i = 0;i < tmp.len;++i) {
-    buffer_put(buffer_1,"_\10",2);
-    buffer_put(buffer_1,tmp.s + i,1);
-  }
 }
 
 static struct dns_transmit tx;
@@ -88,8 +73,8 @@ int resolve(char *q,char qtype[2],char ip[4])
   taia_sub(&stamp,&stamp,&start);
   taia_uint(&deadline,1);
   if (taia_less(&deadline,&stamp)) {
-    buffer_puts(buffer_1,ALERT);
-    buffer_puts(buffer_1,"resolution took more than 1 second\n");
+    buffer_put(buffer_1,querystr.s,querystr.len);
+    buffer_puts(buffer_1,"ALERT:took more than 1 second\n");
   }
 
   return 0;
@@ -141,7 +126,7 @@ GEN_ALLOC_append(qt_alloc,struct qt,s,len,a,i,n,x,30,qt_alloc_readyplus,qt_alloc
 
 static qt_alloc qt;
 
-void qt_add(char *q,char type[2],char *control,char ip[4])
+void qt_add(const char *q,const char type[2],const char *control,const char ip[4])
 {
   struct qt x;
   int i;
@@ -163,7 +148,7 @@ void qt_add(char *q,char type[2],char *control,char ip[4])
   if (!qt_alloc_append(&qt,&x)) nomem();
 }
 
-void query_add(char *owner,char type[2])
+void query_add(const char *owner,const char type[2])
 {
   struct query x;
   int i;
@@ -186,11 +171,18 @@ void query_add(char *owner,char type[2])
 	  qt_add(owner,type,ns.s[i].owner,address.s[j].ip);
 }
 
-void ns_add(char *owner,char *server)
+void ns_add(const char *owner,const char *server)
 {
   struct ns x;
   int i;
   int j;
+
+  buffer_put(buffer_1,querystr.s,querystr.len);
+  buffer_puts(buffer_1,"NS:");
+  printdomain(owner);
+  buffer_puts(buffer_1,":");
+  printdomain(server);
+  buffer_puts(buffer_1,"\n");
 
   for (i = 0;i < ns.len;++i)
     if (dns_domain_equal(ns.s[i].owner,owner))
@@ -198,12 +190,6 @@ void ns_add(char *owner,char *server)
 	return;
 
   query_add(server,DNS_T_A);
-
-  buffer_puts(buffer_1,"\t\t\t\t");
-  printdomain(owner);
-  buffer_puts(buffer_1," cache NS ");
-  printdomain(server);
-  buffer_puts(buffer_1,"\n");
 
   byte_zero(&x,sizeof x);
   if (!dns_domain_copy(&x.owner,owner)) nomem();
@@ -217,22 +203,23 @@ void ns_add(char *owner,char *server)
 	  qt_add(query.s[i].owner,query.s[i].type,owner,address.s[j].ip);
 }
 
-void address_add(char *owner,char ip[4])
+void address_add(const char *owner,const char ip[4])
 {
   struct address x;
   int i;
   int j;
 
+  buffer_put(buffer_1,querystr.s,querystr.len);
+  buffer_puts(buffer_1,"A:");
+  printdomain(owner);
+  buffer_puts(buffer_1,":");
+  buffer_put(buffer_1,ipstr,ip4_fmt(ipstr,ip));
+  buffer_puts(buffer_1,"\n");
+
   for (i = 0;i < address.len;++i)
     if (dns_domain_equal(address.s[i].owner,owner))
       if (byte_equal(address.s[i].ip,4,ip))
 	return;
-
-  buffer_puts(buffer_1,"\t\t\t\t");
-  printdomain(owner);
-  buffer_puts(buffer_1," cache A ");
-  buffer_put(buffer_1,ipstr,ip4_fmt(ipstr,ip));
-  buffer_puts(buffer_1,"\n");
 
   byte_zero(&x,sizeof x);
   if (!dns_domain_copy(&x.owner,owner)) nomem();
@@ -253,17 +240,16 @@ static char *t2;
 static char *referral;
 static char *cname;
 
-static int typematch(char rtype[2],char qtype[2])
+static int typematch(const char rtype[2],const char qtype[2])
 {
   return byte_equal(qtype,2,rtype) || byte_equal(qtype,2,DNS_T_ANY);
 }
 
-void parsepacket(char *buf,unsigned int len,char *d,char dtype[2],char *control)
+void parsepacket(const char *buf,unsigned int len,const char *d,const char dtype[2],const char *control)
 {
   char misc[20];
   char header[12];
   unsigned int pos;
-  unsigned int pos2;
   uint16 numanswers;
   unsigned int posanswers;
   uint16 numauthority;
@@ -276,9 +262,8 @@ void parsepacket(char *buf,unsigned int len,char *d,char dtype[2],char *control)
   int flagcname;
   int flagreferral;
   int flagsoa;
-  int i;
   int j;
-  char *x;
+  const char *x;
 
   pos = dns_packet_copy(buf,len,0,header,12); if (!pos) goto DIE;
   pos = dns_packet_skipname(buf,len,pos); if (!pos) goto DIE;
@@ -327,8 +312,8 @@ void parsepacket(char *buf,unsigned int len,char *d,char dtype[2],char *control)
 
   if (!flagcname && !rcode && !flagout && flagreferral && !flagsoa)
     if (dns_domain_equal(referral,control) || !dns_domain_suffix(referral,control)) {
-      buffer_puts(buffer_1,ALERT);
-      buffer_puts(buffer_1,"lame server; refers to ");
+      buffer_put(buffer_1,querystr.s,querystr.len);
+      buffer_puts(buffer_1,"ALERT:lame server; refers to ");
       printdomain(referral);
       buffer_puts(buffer_1,"\n");
       return;
@@ -356,18 +341,21 @@ void parsepacket(char *buf,unsigned int len,char *d,char dtype[2],char *control)
 
   if (flagcname) {
     query_add(cname,dtype);
-    buffer_puts(buffer_1,"\t\t\t\tCNAME ");
+    buffer_put(buffer_1,querystr.s,querystr.len);
+    buffer_puts(buffer_1,"CNAME:");
     printdomain(cname);
     buffer_puts(buffer_1,"\n");
     return;
   }
   if (rcode == 3) {
-    buffer_puts(buffer_1,"\t\t\t\tNXDOMAIN\n");
+    buffer_put(buffer_1,querystr.s,querystr.len);
+    buffer_puts(buffer_1,"NXDOMAIN\n");
     return;
   }
   if (flagout || flagsoa || !flagreferral) {
     if (!flagout) {
-      buffer_puts(buffer_1,"\t\t\t\tNODATA\n");
+      buffer_put(buffer_1,querystr.s,querystr.len);
+      buffer_puts(buffer_1,"NODATA\n");
       return;
     }
     pos = posanswers;
@@ -375,27 +363,30 @@ void parsepacket(char *buf,unsigned int len,char *d,char dtype[2],char *control)
       pos = printrecord(&tmp,buf,len,pos,d,dtype);
       if (!pos) goto DIE;
       if (tmp.len) {
-        buffer_puts(buffer_1,"\t\t\t\t");
-        buffer_put(buffer_1,tmp.s,tmp.len);
+        buffer_put(buffer_1,querystr.s,querystr.len);
+        buffer_puts(buffer_1,"answer:");
+        buffer_put(buffer_1,tmp.s,tmp.len); /* includes \n */
       }
     }
     return;
   }
 
   if (!dns_domain_suffix(d,referral)) goto DIE;
-  buffer_puts(buffer_1,"\t\t\t\tsee ");
+  buffer_put(buffer_1,querystr.s,querystr.len);
+  buffer_puts(buffer_1,"see:");
   printdomain(referral);
   buffer_puts(buffer_1,"\n");
   return;
 
   DIE:
   x = error_str(errno);
-  buffer_puts(buffer_1,ALERT);
-  buffer_puts(buffer_1,"unable to parse response packet: ");
+  buffer_put(buffer_1,querystr.s,querystr.len);
+  buffer_puts(buffer_1,"ALERT:unable to parse response packet; ");
   buffer_puts(buffer_1,x);
+  buffer_puts(buffer_1,"\n");
 }
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   static stralloc out;
   static stralloc fqdn;
@@ -404,11 +395,12 @@ main(int argc,char **argv)
   char *control;
   char type[2];
   char ip[64];
-  int r;
   int i;
-  char ch;
+  uint16 u16;
 
   dns_random_init(seed);
+
+  if (!stralloc_copys(&querystr,"0:.:.::")) nomem();
 
   if (!address_alloc_readyplus(&address,1)) nomem();
   if (!query_alloc_readyplus(&query,1)) nomem();
@@ -434,38 +426,47 @@ main(int argc,char **argv)
 
   for (i = 0;i < qt.len;++i) {
     if (!dns_domain_copy(&q,qt.s[i].owner)) nomem();
-    control = dns_domain_suffix(q,qt.s[i].control);
-    if (!control) continue;
+    control = qt.s[i].control;
+    if (!dns_domain_suffix(q,control)) continue;
     byte_copy(type,2,qt.s[i].type);
     byte_copy(ip,4,qt.s[i].ip);
 
-    printtype(type);
-    buffer_puts(buffer_1," ");
-    if (control == q)
-      printcontrol(control);
-    else {
-      ch = *control;
-      *control = 0;
-      printdomain(q);
-      if (ch) {
-        *control = ch;
-        buffer_puts(buffer_1,".");
-        printcontrol(control);
-      }
-    }
-    buffer_puts(buffer_1," ");
-    buffer_put(buffer_1,ipstr,ip4_fmt(ipstr,ip));
-    buffer_puts(buffer_1,"\n");
+    if (!stralloc_copys(&querystr,"")) nomem();
+    uint16_unpack_big(type,&u16);
+    if (!stralloc_catulong0(&querystr,u16,0)) nomem();
+    if (!stralloc_cats(&querystr,":")) nomem();
+    if (!dns_domain_todot_cat(&querystr,q)) nomem();
+    if (!stralloc_cats(&querystr,":")) nomem();
+    if (!dns_domain_todot_cat(&querystr,control)) nomem();
+    if (!stralloc_cats(&querystr,":")) nomem();
+    if (!stralloc_catb(&querystr,ipstr,ip4_fmt(ipstr,ip))) nomem();
+    if (!stralloc_cats(&querystr,":")) nomem();
+
+    buffer_put(buffer_1,querystr.s,querystr.len);
+    buffer_puts(buffer_1,"tx\n");
     buffer_flush(buffer_1);
 
     if (resolve(q,type,ip) == -1) {
-      char *x = error_str(errno);
-      buffer_puts(buffer_1,ALERT);
+      const char *x = error_str(errno);
+      buffer_put(buffer_1,querystr.s,querystr.len);
+      buffer_puts(buffer_1,"ALERT:query failed; ");
       buffer_puts(buffer_1,x);
       buffer_puts(buffer_1,"\n");
     }
     else
       parsepacket(tx.packet,tx.packetlen,q,type,control);
+
+    if (dns_domain_equal(q,"\011localhost\0")) {
+      buffer_put(buffer_1,querystr.s,querystr.len);
+      buffer_puts(buffer_1,"ALERT:some caches do not handle localhost internally\n");
+      address_add(q,"\177\0\0\1");
+    }
+    if (dd(q,"",ip) == 4) {
+      buffer_put(buffer_1,querystr.s,querystr.len);
+      buffer_puts(buffer_1,"ALERT:some caches do not handle IP addresses internally\n");
+      address_add(q,ip);
+    }
+
     buffer_flush(buffer_1);
   }
 

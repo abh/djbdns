@@ -3,7 +3,7 @@
 #include "byte.h"
 #include "error.h"
 
-static int allwrite(int (*op)(),int fd,char *buf,unsigned int len)
+static int allwrite(int (*op)(),int fd,const char *buf,unsigned int len)
 {
   int w;
 
@@ -30,7 +30,7 @@ int buffer_flush(buffer *s)
   return allwrite(s->op,s->fd,s->x,p);
 }
 
-int buffer_putalign(buffer *s,char *buf,unsigned int len)
+int buffer_putalign(buffer *s,const char *buf,unsigned int len)
 {
   unsigned int n;
  
@@ -44,7 +44,7 @@ int buffer_putalign(buffer *s,char *buf,unsigned int len)
   return 0;
 }
 
-int buffer_put(buffer *s,char *buf,unsigned int len)
+int buffer_put(buffer *s,const char *buf,unsigned int len)
 {
   unsigned int n;
  
@@ -66,23 +66,23 @@ int buffer_put(buffer *s,char *buf,unsigned int len)
   return 0;
 }
 
-int buffer_putflush(buffer *s,char *buf,unsigned int len)
+int buffer_putflush(buffer *s,const char *buf,unsigned int len)
 {
   if (buffer_flush(s) == -1) return -1;
   return allwrite(s->op,s->fd,buf,len);
 }
 
-int buffer_putsalign(buffer *s,char *buf)
+int buffer_putsalign(buffer *s,const char *buf)
 {
   return buffer_putalign(s,buf,str_len(buf));
 }
 
-int buffer_puts(buffer *s,char *buf)
+int buffer_puts(buffer *s,const char *buf)
 {
   return buffer_put(s,buf,str_len(buf));
 }
 
-int buffer_putsflush(buffer *s,char *buf)
+int buffer_putsflush(buffer *s,const char *buf)
 {
   return buffer_putflush(s,buf,str_len(buf));
 }

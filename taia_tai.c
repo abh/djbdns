@@ -1,6 +1,6 @@
 #include "taia.h"
 
-void taia_tai(struct taia *ta,struct tai *t)
+void taia_tai(const struct taia *ta,struct tai *t)
 {
   *t = ta->sec;
 }

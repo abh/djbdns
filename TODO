@@ -1,9 +1,13 @@
 end-to-end nym-based security
 link-level security
 
-consider dd in dnstrace
-
 try to get the root authorities to set up a secure, usable NS-list system
+have dnscache-conf keep track of copies of dnsroots.global
 incorporate automatic NS-list upgrades
 
+consider merging pickdns and tinydns
+
+consider dead-server table in dnscache
+
+IPv6 records
 DNS over IPv6

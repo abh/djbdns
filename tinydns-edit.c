@@ -1,9 +1,11 @@
+#include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "stralloc.h"
 #include "buffer.h"
-#include "readwrite.h"
 #include "exit.h"
+#include "open.h"
 #include "getln.h"
 #include "strerr.h"
 #include "scan.h"
@@ -65,12 +67,12 @@ char strnum[FMT_ULONG];
 static char *names[26];
 static int used[26];
 
-void put(char *buf,unsigned int len)
+void put(const char *buf,unsigned int len)
 {
   if (buffer_putalign(&bnew,buf,len) == -1) die_write();
 }
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   unsigned long ttl;
   struct stat st;
@@ -109,12 +111,12 @@ main(int argc,char **argv)
   fd = open_read(fn);
   if (fd == -1) die_read();
   if (fstat(fd,&st) == -1) die_read();
-  buffer_init(&b,read,fd,bspace,sizeof bspace);
+  buffer_init(&b,buffer_unixread,fd,bspace,sizeof bspace);
 
   fdnew = open_trunc(fnnew);
   if (fdnew == -1) die_write();
   if (fchmod(fdnew,st.st_mode & 0644) == -1) die_write();
-  buffer_init(&bnew,write,fdnew,bnewspace,sizeof bnewspace);
+  buffer_init(&bnew,buffer_unixwrite,fdnew,bnewspace,sizeof bnewspace);
 
   switch(mode) {
     case '.': case '&':

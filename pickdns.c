@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "byte.h"
 #include "case.h"
 #include "dns.h"
@@ -5,7 +6,7 @@
 #include "cdb.h"
 #include "response.h"
 
-char *fatal = "pickdns: fatal: ";
+const char *fatal = "pickdns: fatal: ";
 
 static char seed[128];
 
@@ -23,11 +24,16 @@ static int doit(char *q,char qtype[2],char ip[4])
   int r;
   uint32 dlen;
   unsigned int qlen;
+  int flaga;
+  int flagmx;
 
   qlen = dns_domain_length(q);
   if (qlen > 255) return 0; /* impossible */
 
-  if (byte_diff(qtype,2,DNS_T_A) && byte_diff(qtype,2,DNS_T_ANY)) goto REFUSE;
+  flaga = byte_equal(qtype,2,DNS_T_A);
+  flagmx = byte_equal(qtype,2,DNS_T_MX);
+  if (byte_equal(qtype,2,DNS_T_ANY)) flaga = flagmx = 1;
+  if (!flaga && !flagmx) goto REFUSE;
 
   key[0] = '%';
   byte_copy(key + 1,4,ip);
@@ -58,14 +64,15 @@ static int doit(char *q,char qtype[2],char ip[4])
   if (dlen > 512) dlen = 512;
   if (cdb_read(&c,data,dlen,cdb_datapos(&c)) == -1) return 0;
 
-  dns_sortip(data,dlen);
-
-  if (dlen > 12) dlen = 12;
-  while (dlen >= 4) {
-    dlen -= 4;
-    if (!response_rstart(q,DNS_T_A,"\0\0\0\5")) return 0;
-    if (!response_addbytes(data + dlen,4)) return 0;
-    response_rfinish(RESPONSE_ANSWER);
+  if (flaga) {
+    dns_sortip(data,dlen);
+    if (dlen > 12) dlen = 12;
+    while (dlen >= 4) {
+      dlen -= 4;
+      if (!response_rstart(q,DNS_T_A,5)) return 0;
+      if (!response_addbytes(data + dlen,4)) return 0;
+      response_rfinish(RESPONSE_ANSWER);
+    }
   }
 
   return 1;

@@ -1,8 +1,8 @@
 #include "str.h"
 
-unsigned int str_len(char *s)
+unsigned int str_len(const char *s)
 {
-  register char *t;
+  register const char *t;
 
   t = s;
   for (;;) {

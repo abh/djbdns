@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "strerr.h"
 #include "buffer.h"
 #include "stralloc.h"
@@ -10,7 +11,6 @@
 #include "sgetopt.h"
 #include "iopause.h"
 #include "error.h"
-#include "readwrite.h"
 #include "exit.h"
 
 #define FATAL "dnsfilter: fatal: "
@@ -59,7 +59,7 @@ void errout(int i)
       x[i].middle.s[j] = '-';
 }
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   struct taia stamp;
   struct taia deadline;

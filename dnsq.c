@@ -58,7 +58,7 @@ static stralloc out;
 
 static char seed[128];
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   uint16 u16;
 

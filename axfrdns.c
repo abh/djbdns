@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "droproot.h"
 #include "exit.h"
 #include "env.h"
@@ -6,7 +7,6 @@
 #include "ip4.h"
 #include "tai.h"
 #include "buffer.h"
-#include "readwrite.h"
 #include "timeoutread.h"
 #include "timeoutwrite.h"
 #include "open.h"
@@ -18,6 +18,8 @@
 #include "byte.h"
 #include "case.h"
 #include "dns.h"
+#include "scan.h"
+#include "qlog.h"
 #include "response.h"
 
 #define FATAL "axfrdns: fatal: "
@@ -120,7 +122,7 @@ void get(char *buf,unsigned int len)
 }
 
 struct tai now;
-char data[512];
+char data[32767];
 uint32 dlen;
 uint32 dpos;
 
@@ -140,7 +142,6 @@ void doname(stralloc *sa)
 
 int build(stralloc *sa,char *q,int flagsoa)
 {
-  static char *d1;
   unsigned int rdatapos;
   char misc[20];
   char type[2];
@@ -206,9 +207,8 @@ static char *q;
 static stralloc soa;
 static stralloc message;
 
-void doaxfr(int fdcdb)
+void doaxfr(void)
 {
-  char misc[20];
   char key[512];
   uint32 klen;
   char num[4];
@@ -234,7 +234,7 @@ void doaxfr(int fdcdb)
   print(soa.s,soa.len);
 
   seek_begin(fdcdb);
-  buffer_init(&bcdb,read,fdcdb,bcdbspace,sizeof bcdbspace);
+  buffer_init(&bcdb,buffer_unixread,fdcdb,bcdbspace,sizeof bcdbspace);
 
   pos = 0;
   get(num,4); pos += 4;
@@ -252,9 +252,9 @@ void doaxfr(int fdcdb)
     if (eod - pos < dlen) die_cdbformat();
     pos += dlen;
 
-    if (klen > 512) die_cdbformat();
+    if (klen > sizeof key) die_cdbformat();
     get(key,klen);
-    if (dlen > 512) die_cdbformat();
+    if (dlen > sizeof data) die_cdbformat();
     get(data,dlen);
 
     if (klen < 1) die_cdbformat();
@@ -286,12 +286,12 @@ char tcpheader[2];
 char buf[512];
 uint16 len;
 
-main()
+int main()
 {
   unsigned int pos;
   char header[12];
   char qtype[2];
-  char *x;
+  const char *x;
 
   droproot(FATAL);
 
@@ -327,7 +327,7 @@ main()
       case_lowerb(zone,zonelen);
       fdcdb = open_read("data.cdb");
       if (fdcdb == -1) die_cdbread();
-      doaxfr(fdcdb);
+      doaxfr();
       close(fdcdb);
     }
     else {

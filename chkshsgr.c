@@ -1,6 +1,6 @@
 #include "exit.h"
 
-main()
+int main()
 {
   short x[4];
 

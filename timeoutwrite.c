@@ -1,6 +1,6 @@
+#include <unistd.h>
 #include "error.h"
 #include "iopause.h"
-#include "readwrite.h"
 #include "timeoutwrite.h"
 
 int timeoutwrite(int t,int fd,char *buf,int len)

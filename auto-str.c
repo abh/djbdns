@@ -1,16 +1,15 @@
 #include "buffer.h"
-#include "readwrite.h"
 #include "exit.h"
 
 char bspace[256];
-buffer b = BUFFER_INIT(write,1,bspace,sizeof bspace);
+buffer b = BUFFER_INIT(buffer_unixwrite,1,bspace,sizeof bspace);
 
-void puts(char *s)
+void puts(const char *s)
 {
   if (buffer_puts(&b,s) == -1) _exit(111);
 }
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   char *name;
   char *value;
@@ -22,7 +21,7 @@ main(int argc,char **argv)
   value = argv[2];
   if (!value) _exit(100);
 
-  puts("char ");
+  puts("const char ");
   puts(name);
   puts("[] = \"\\\n");
 

@@ -2,7 +2,7 @@
 
 /* XXX: breaks tai encapsulation */
 
-int taia_less(struct taia *t,struct taia *u)
+int taia_less(const struct taia *t,const struct taia *u)
 {
   if (t->sec.x < u->sec.x) return 1;
   if (t->sec.x > u->sec.x) return 0;

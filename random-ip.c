@@ -13,7 +13,7 @@ char strnum[FMT_ULONG];
 
 char seed[128];
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   unsigned long u;
   int i;

@@ -1,6 +1,6 @@
 #include "uint32.h"
 
-void uint32_unpack(char s[4],uint32 *u)
+void uint32_unpack(const char s[4],uint32 *u)
 {
   uint32 result;
 
@@ -15,7 +15,7 @@ void uint32_unpack(char s[4],uint32 *u)
   *u = result;
 }
 
-void uint32_unpack_big(char s[4],uint32 *u)
+void uint32_unpack_big(const char s[4],uint32 *u)
 {
   uint32 result;
 

@@ -1,8 +1,10 @@
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "buffer.h"
 #include "strerr.h"
 #include "error.h"
 #include "open.h"
-#include "readwrite.h"
 #include "exit.h"
 
 extern void hier();
@@ -66,7 +68,7 @@ int mode;
   fdin = open_read(file);
   if (fdin == -1)
     strerr_die4sys(111,FATAL,"unable to read ",file,": ");
-  buffer_init(&ssin,read,fdin,inbuf,sizeof inbuf);
+  buffer_init(&ssin,buffer_unixread,fdin,inbuf,sizeof inbuf);
 
   if (chdir(home) == -1)
     strerr_die4sys(111,FATAL,"unable to switch to ",home,": ");
@@ -76,7 +78,7 @@ int mode;
   fdout = open_trunc(file);
   if (fdout == -1)
     strerr_die6sys(111,FATAL,"unable to write .../",subdir,"/",file,": ");
-  buffer_init(&ssout,write,fdout,outbuf,sizeof outbuf);
+  buffer_init(&ssout,buffer_unixwrite,fdout,outbuf,sizeof outbuf);
 
   switch(buffer_copy(&ssout,&ssin)) {
     case -2:
@@ -118,7 +120,7 @@ int mode;
   fdout = open_trunc(file);
   if (fdout == -1)
     strerr_die6sys(111,FATAL,"unable to write .../",subdir,"/",file,": ");
-  buffer_init(&ssout,write,fdout,outbuf,sizeof outbuf);
+  buffer_init(&ssout,buffer_unixwrite,fdout,outbuf,sizeof outbuf);
 
   while (len-- > 0)
     if (buffer_put(&ssout,"",1) == -1)
@@ -137,7 +139,7 @@ int mode;
     strerr_die6sys(111,FATAL,"unable to chmod .../",subdir,"/",file,": ");
 }
 
-main()
+int main()
 {
   fdsourcedir = open_read(".");
   if (fdsourcedir == -1)

@@ -12,7 +12,7 @@ static char name[NAMES][128];
 static unsigned int name_ptr[NAMES]; /* each < 16384 */
 static unsigned int name_num;
 
-int response_addbytes(char *buf,unsigned int len)
+int response_addbytes(const char *buf,unsigned int len)
 {
   if (len > 65535 - response_len) return 0;
   byte_copy(response + response_len,len,buf);
@@ -20,7 +20,7 @@ int response_addbytes(char *buf,unsigned int len)
   return 1;
 }
 
-int response_addname(char *d)
+int response_addname(const char *d)
 {
   unsigned int dlen;
   unsigned int i;
@@ -49,7 +49,7 @@ int response_addname(char *d)
   return response_addbytes(d,1);
 }
 
-int response_query(char *q,char qtype[2])
+int response_query(const char *q,const char qtype[2])
 {
   response_len = 0;
   name_num = 0;
@@ -63,12 +63,22 @@ int response_query(char *q,char qtype[2])
 
 static unsigned int dpos;
 
-int response_rstart(char *d,char type[2],char ttl[4])
+static int flaghidettl = 0;
+
+void response_hidettl(void)
 {
+  flaghidettl = 1;
+}
+
+int response_rstart(const char *d,const char type[2],uint32 ttl)
+{
+  char ttlstr[4];
   if (!response_addname(d)) return 0;
   if (!response_addbytes(type,2)) return 0;
   if (!response_addbytes(DNS_C_IN,2)) return 0;
-  if (!response_addbytes(ttl,4)) return 0;
+  if (flaghidettl) ttl = 0;
+  uint32_pack_big(ttlstr,ttl);
+  if (!response_addbytes(ttlstr,4)) return 0;
   if (!response_addbytes("\0\0",2)) return 0;
   dpos = response_len;
   return 1;
@@ -80,9 +90,9 @@ void response_rfinish(int x)
   if (!++response[x + 1]) ++response[x];
 }
 
-int response_cname(char *c,char *d)
+int response_cname(const char *c,const char *d,uint32 ttl)
 {
-  if (!response_rstart(c,DNS_T_CNAME,"\0\0\0\0")) return 0;
+  if (!response_rstart(c,DNS_T_CNAME,ttl)) return 0;
   if (!response_addname(d)) return 0;
   response_rfinish(RESPONSE_ANSWER);
   return 1;
@@ -99,7 +109,7 @@ void response_servfail(void)
   response[3] |= 2;
 }
 
-void response_id(char id[2])
+void response_id(const char id[2])
 {
   byte_copy(response,2,id);
 }

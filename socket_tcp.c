@@ -2,6 +2,7 @@
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #include "ndelay.h"
 #include "socket.h"
 

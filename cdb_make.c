@@ -1,6 +1,5 @@
 /* Public domain. */
 
-#include "readwrite.h"
 #include "seek.h"
 #include "error.h"
 #include "alloc.h"
@@ -15,7 +14,7 @@ int cdb_make_start(struct cdb_make *c,int fd)
   c->numentries = 0;
   c->fd = fd;
   c->pos = sizeof c->final;
-  buffer_init(&c->b,write,fd,c->bspace,sizeof c->bspace);
+  buffer_init(&c->b,buffer_unixwrite,fd,c->bspace,sizeof c->bspace);
   return seek_set(fd,c->pos);
 }
 
@@ -62,7 +61,7 @@ int cdb_make_addbegin(struct cdb_make *c,unsigned int keylen,unsigned int datale
   return 0;
 }
 
-int cdb_make_add(struct cdb_make *c,char *key,unsigned int keylen,char *data,unsigned int datalen)
+int cdb_make_add(struct cdb_make *c,const char *key,unsigned int keylen,const char *data,unsigned int datalen)
 {
   if (cdb_make_addbegin(c,keylen,datalen) == -1) return -1;
   if (buffer_putalign(&c->b,key,keylen) == -1) return -1;

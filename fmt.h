@@ -19,7 +19,7 @@ extern unsigned int fmt_plusminus(char *,int);
 extern unsigned int fmt_minus(char *,int);
 extern unsigned int fmt_0x(char *,int);
 
-extern unsigned int fmt_str(char *,char *);
-extern unsigned int fmt_strn(char *,char *,unsigned int);
+extern unsigned int fmt_str(char *,const char *);
+extern unsigned int fmt_strn(char *,const char *,unsigned int);
 
 #endif

@@ -16,12 +16,12 @@ typedef struct buffer {
 extern void buffer_init(buffer *,int (*)(),int,char *,unsigned int);
 
 extern int buffer_flush(buffer *);
-extern int buffer_put(buffer *,char *,unsigned int);
-extern int buffer_putalign(buffer *,char *,unsigned int);
-extern int buffer_putflush(buffer *,char *,unsigned int);
-extern int buffer_puts(buffer *,char *);
-extern int buffer_putsalign(buffer *,char *);
-extern int buffer_putsflush(buffer *,char *);
+extern int buffer_put(buffer *,const char *,unsigned int);
+extern int buffer_putalign(buffer *,const char *,unsigned int);
+extern int buffer_putflush(buffer *,const char *,unsigned int);
+extern int buffer_puts(buffer *,const char *);
+extern int buffer_putsalign(buffer *,const char *);
+extern int buffer_putsflush(buffer *,const char *);
 
 #define buffer_PUTC(s,c) \
   ( ((s)->n != (s)->p) \
@@ -46,6 +46,9 @@ extern void buffer_seek(buffer *,unsigned int);
   )
 
 extern int buffer_copy(buffer *,buffer *);
+
+extern int buffer_unixread(int,char *,unsigned int);
+extern int buffer_unixwrite(int,const char *,unsigned int);
 
 extern buffer *buffer_0;
 extern buffer *buffer_0small;

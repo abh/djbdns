@@ -5,7 +5,7 @@
 
 static char *q = 0;
 
-int dns_mx_packet(stralloc *out,char *buf,unsigned int len)
+int dns_mx_packet(stralloc *out,const char *buf,unsigned int len)
 {
   unsigned int pos;
   char header[12];
@@ -38,7 +38,7 @@ int dns_mx_packet(stralloc *out,char *buf,unsigned int len)
   return 0;
 }
 
-int dns_mx(stralloc *out,stralloc *fqdn)
+int dns_mx(stralloc *out,const stralloc *fqdn)
 {
   if (!dns_domain_fromdot(&q,fqdn->s,fqdn->len)) return -1;
   if (dns_resolve(q,DNS_T_MX) == -1) return -1;

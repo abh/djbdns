@@ -1,28 +1,28 @@
 #ifndef SCAN_H
 #define SCAN_H
 
-extern unsigned int scan_uint(char *,unsigned int *);
-extern unsigned int scan_xint(char *,unsigned int *);
-extern unsigned int scan_nbbint(char *,unsigned int,unsigned int,unsigned int,unsigned int *);
-extern unsigned int scan_ushort(char *,unsigned short *);
-extern unsigned int scan_xshort(char *,unsigned short *);
-extern unsigned int scan_nbbshort(char *,unsigned int,unsigned int,unsigned int,unsigned short *);
-extern unsigned int scan_ulong(char *,unsigned long *);
-extern unsigned int scan_xlong(char *,unsigned long *);
-extern unsigned int scan_nbblong(char *,unsigned int,unsigned int,unsigned int,unsigned long *);
+extern unsigned int scan_uint(const char *,unsigned int *);
+extern unsigned int scan_xint(const char *,unsigned int *);
+extern unsigned int scan_nbbint(const char *,unsigned int,unsigned int,unsigned int,unsigned int *);
+extern unsigned int scan_ushort(const char *,unsigned short *);
+extern unsigned int scan_xshort(const char *,unsigned short *);
+extern unsigned int scan_nbbshort(const char *,unsigned int,unsigned int,unsigned int,unsigned short *);
+extern unsigned int scan_ulong(const char *,unsigned long *);
+extern unsigned int scan_xlong(const char *,unsigned long *);
+extern unsigned int scan_nbblong(const char *,unsigned int,unsigned int,unsigned int,unsigned long *);
 
-extern unsigned int scan_plusminus(char *,int *);
-extern unsigned int scan_0x(char *,unsigned int *);
+extern unsigned int scan_plusminus(const char *,int *);
+extern unsigned int scan_0x(const char *,unsigned int *);
 
-extern unsigned int scan_whitenskip(char *,unsigned int);
-extern unsigned int scan_nonwhitenskip(char *,unsigned int);
-extern unsigned int scan_charsetnskip(char *,char *,unsigned int);
-extern unsigned int scan_noncharsetnskip(char *,char *,unsigned int);
+extern unsigned int scan_whitenskip(const char *,unsigned int);
+extern unsigned int scan_nonwhitenskip(const char *,unsigned int);
+extern unsigned int scan_charsetnskip(const char *,const char *,unsigned int);
+extern unsigned int scan_noncharsetnskip(const char *,const char *,unsigned int);
 
-extern unsigned int scan_strncmp(char *,char *,unsigned int);
-extern unsigned int scan_memcmp(char *,char *,unsigned int);
+extern unsigned int scan_strncmp(const char *,const char *,unsigned int);
+extern unsigned int scan_memcmp(const char *,const char *,unsigned int);
 
-extern unsigned int scan_long(char *,long *);
-extern unsigned int scan_8long(char *,unsigned long *);
+extern unsigned int scan_long(const char *,long *);
+extern unsigned int scan_8long(const char *,unsigned long *);
 
 #endif

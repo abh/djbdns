@@ -1,6 +1,6 @@
 #ifndef DD_H
 #define DD_H
 
-extern int dd(char *,char *,char *);
+extern int dd(const char *,const char *,char *);
 
 #endif

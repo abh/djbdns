@@ -1,5 +1,8 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "buffer.h"
-#include "readwrite.h"
 #include "exit.h"
 #include "cdb_make.h"
 #include "open.h"
@@ -7,6 +10,7 @@
 #include "gen_allocdefs.h"
 #include "stralloc.h"
 #include "getln.h"
+#include "case.h"
 #include "strerr.h"
 #include "str.h"
 #include "byte.h"
@@ -110,11 +114,9 @@ unsigned long linenum = 0;
 #define NUMFIELDS 3
 static stralloc f[NUMFIELDS];
 
-static char *d1;
-
 char strnum[FMT_ULONG];
 
-void syntaxerror(char *why)
+void syntaxerror(const char *why)
 {
   strnum[fmt_ulong(strnum,linenum)] = 0;
   strerr_die4x(111,FATAL,"unable to parse data line ",strnum,why);
@@ -124,7 +126,7 @@ void die_datatmp(void)
   strerr_die2sys(111,FATAL,"unable to create data.tmp: ");
 }
 
-main()
+int main()
 {
   struct address t;
   int i;
@@ -138,7 +140,7 @@ main()
 
   fd = open_read("data");
   if (fd == -1) strerr_die2sys(111,FATAL,"unable to open data: ");
-  buffer_init(&b,read,fd,bspace,sizeof bspace);
+  buffer_init(&b,buffer_unixread,fd,bspace,sizeof bspace);
 
   fdcdb = open_trunc("data.tmp");
   if (fdcdb == -1) die_datatmp();

@@ -5,7 +5,7 @@
 #include "byte.h"
 #include "socket.h"
 
-int socket_send4(int s,char *buf,int len,char ip[4],uint16 port)
+int socket_send4(int s,const char *buf,int len,const char ip[4],uint16 port)
 {
   struct sockaddr_in sa;
 

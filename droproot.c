@@ -1,9 +1,10 @@
+#include <unistd.h>
 #include "env.h"
 #include "scan.h"
 #include "prot.h"
 #include "strerr.h"
 
-void droproot(char *fatal)
+void droproot(const char *fatal)
 {
   char *x;
   unsigned long id;

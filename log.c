@@ -29,7 +29,7 @@ static void hex(unsigned char c)
   buffer_put(buffer_2,"0123456789abcdef" + (c & 15),1);
 }
 
-static void string(char *s)
+static void string(const char *s)
 {
   buffer_puts(buffer_2,s);
 }
@@ -45,21 +45,21 @@ static void space(void)
   string(" ");
 }
 
-static void ip(char ip[4])
+static void ip(const char i[4])
 {
-  hex(ip[0]);
-  hex(ip[1]);
-  hex(ip[2]);
-  hex(ip[3]);
+  hex(i[0]);
+  hex(i[1]);
+  hex(i[2]);
+  hex(i[3]);
 }
 
-static void logid(char id[2])
+static void logid(const char id[2])
 {
   hex(id[0]);
   hex(id[1]);
 }
 
-static void logtype(char type[2])
+static void logtype(const char type[2])
 {
   uint16 u;
 
@@ -67,7 +67,7 @@ static void logtype(char type[2])
   number(u);
 }
 
-static void name(char *q)
+static void name(const char *q)
 {
   char ch;
   int state;
@@ -94,48 +94,48 @@ void log_startup(void)
   line();
 }
 
-void log_query(unsigned int qnum,char client[4],unsigned int port,char id[2],char *q,char qtype[2])
+void log_query(uint64 *qnum,const char client[4],unsigned int port,const char id[2],const char *q,const char qtype[2])
 {
-  string("query "); number(qnum); space();
+  string("query "); number(*qnum); space();
   ip(client); string(":"); hex(port >> 8); hex(port & 255);
   string(":"); logid(id); space();
   logtype(qtype); space(); name(q);
   line();
 }
 
-void log_querydone(unsigned int qnum,unsigned int len)
+void log_querydone(uint64 *qnum,unsigned int len)
 {
-  string("sent "); number(qnum); space();
+  string("sent "); number(*qnum); space();
   number(len);
   line();
 }
 
-void log_querydrop(unsigned int qnum)
+void log_querydrop(uint64 *qnum)
 {
-  char *x = error_str(errno);
+  const char *x = error_str(errno);
 
-  string("drop "); number(qnum); space();
+  string("drop "); number(*qnum); space();
   string(x);
   line();
 }
 
-void log_conn(unsigned int qnum,char client[4],unsigned int port)
+void log_tcpopen(const char client[4],unsigned int port)
 {
-  string("connection "); number(qnum); space();
+  string("tcpopen ");
   ip(client); string(":"); hex(port >> 8); hex(port & 255);
   line();
 }
 
-void log_conndrop(unsigned int qnum)
+void log_tcpclose(const char client[4],unsigned int port)
 {
-  char *x = error_str(errno);
-
-  string("dropconnection "); number(qnum); space();
+  const char *x = error_str(errno);
+  string("tcpclose ");
+  ip(client); string(":"); hex(port >> 8); hex(port & 255); space();
   string(x);
   line();
 }
 
-void log_tx(char *q,char qtype[2],char *control,char servers[64],unsigned int gluelessness)
+void log_tx(const char *q,const char qtype[2],const char *control,const char servers[64],unsigned int gluelessness)
 {
   int i;
 
@@ -150,68 +150,68 @@ void log_tx(char *q,char qtype[2],char *control,char servers[64],unsigned int gl
   line();
 }
 
-void log_cachedanswer(char *q,char type[2])
+void log_cachedanswer(const char *q,const char type[2])
 {
   string("cached "); logtype(type); space();
   name(q);
   line();
 }
 
-void log_cachedcname(char *dn,char *dn2)
+void log_cachedcname(const char *dn,const char *dn2)
 {
   string("cached cname "); name(dn); space(); name(dn2);
   line();
 }
 
-void log_cachedns(char *control,char *ns)
+void log_cachedns(const char *control,const char *ns)
 {
   string("cached ns "); name(control); space(); name(ns);
   line();
 }
 
-void log_cachednxdomain(char *dn)
+void log_cachednxdomain(const char *dn)
 {
   string("cached nxdomain "); name(dn);
   line();
 }
 
-void log_cachedservfail(char *dn)
+void log_cachedservfail(const char *dn)
 {
   string("cached servfail "); name(dn);
   line();
 }
 
-void log_nxdomain(char server[4],char *q,unsigned int ttl)
+void log_nxdomain(const char server[4],const char *q,unsigned int ttl)
 {
   string("nxdomain "); ip(server); space(); number(ttl); space();
   name(q);
   line();
 }
 
-void log_nodata(char server[4],char *q,char qtype[2],unsigned int ttl)
+void log_nodata(const char server[4],const char *q,const char qtype[2],unsigned int ttl)
 {
   string("nodata "); ip(server); space(); number(ttl); space();
   logtype(qtype); space(); name(q);
   line();
 }
 
-void log_lame(char server[4],char *control,char *referral)
+void log_lame(const char server[4],const char *control,const char *referral)
 {
   string("lame "); ip(server); space();
   name(control); space(); name(referral);
   line();
 }
 
-void log_servfail(char *dn)
+void log_servfail(const char *dn)
 {
-  char *x = error_str(errno);
+  const char *x = error_str(errno);
 
   string("servfail "); name(dn); space();
   string(x);
   line();
 }
 
-void log_rr(char server[4],char *q,char type[2],char *buf,unsigned int len,unsigned int ttl)
+void log_rr(const char server[4],const char *q,const char type[2],const char *buf,unsigned int len,unsigned int ttl)
 {
   int i;
 
@@ -228,7 +228,7 @@ void log_rr(char server[4],char *q,char type[2],char *buf,unsigned int len,unsig
   line();
 }
 
-void log_rrns(char server[4],char *q,char *data,unsigned int ttl)
+void log_rrns(const char server[4],const char *q,const char *data,unsigned int ttl)
 {
   string("rr "); ip(server); space(); number(ttl);
   string(" ns "); name(q); space();
@@ -236,7 +236,7 @@ void log_rrns(char server[4],char *q,char *data,unsigned int ttl)
   line();
 }
 
-void log_rrcname(char server[4],char *q,char *data,unsigned int ttl)
+void log_rrcname(const char server[4],const char *q,const char *data,unsigned int ttl)
 {
   string("rr "); ip(server); space(); number(ttl);
   string(" cname "); name(q); space();
@@ -244,7 +244,7 @@ void log_rrcname(char server[4],char *q,char *data,unsigned int ttl)
   line();
 }
 
-void log_rrptr(char server[4],char *q,char *data,unsigned int ttl)
+void log_rrptr(const char server[4],const char *q,const char *data,unsigned int ttl)
 {
   string("rr "); ip(server); space(); number(ttl);
   string(" ptr "); name(q); space();
@@ -252,7 +252,7 @@ void log_rrptr(char server[4],char *q,char *data,unsigned int ttl)
   line();
 }
 
-void log_rrmx(char server[4],char *q,char *mx,char pref[2],unsigned int ttl)
+void log_rrmx(const char server[4],const char *q,const char *mx,const char pref[2],unsigned int ttl)
 {
   uint16 u;
 
@@ -263,7 +263,7 @@ void log_rrmx(char server[4],char *q,char *mx,char pref[2],unsigned int ttl)
   line();
 }
 
-void log_rrsoa(char server[4],char *q,char *n1,char *n2,char misc[20],unsigned int ttl)
+void log_rrsoa(const char server[4],const char *q,const char *n1,const char *n2,const char misc[20],unsigned int ttl)
 {
   uint32 u;
   int i;
@@ -278,11 +278,17 @@ void log_rrsoa(char server[4],char *q,char *n1,char *n2,char misc[20],unsigned i
   line();
 }
 
-void log_stats(uint64 *queries,uint64 *motion,int *active)
+void log_stats(void)
 {
+  extern uint64 numqueries;
+  extern uint64 cache_motion;
+  extern int uactive;
+  extern int tactive;
+
   string("stats ");
-  number(*queries); space();
-  number(*motion); space();
-  number(*active);
+  number(numqueries); space();
+  number(cache_motion); space();
+  number(uactive); space();
+  number(tactive);
   line();
 }

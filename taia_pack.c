@@ -1,6 +1,6 @@
 #include "taia.h"
 
-void taia_pack(char *s,struct taia *t)
+void taia_pack(char *s,const struct taia *t)
 {
   unsigned long x;
 

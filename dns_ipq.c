@@ -4,7 +4,7 @@
 #include "str.h"
 #include "dns.h"
 
-static int doit(stralloc *work,char *rule)
+static int doit(stralloc *work,const char *rule)
 {
   char ch;
   unsigned int colon;
@@ -30,7 +30,7 @@ static int doit(stralloc *work,char *rule)
   return stralloc_cats(work,rule + colon + 1);
 }
 
-int dns_ip4_qualify_rules(stralloc *out,stralloc *fqdn,stralloc *in,stralloc *rules)
+int dns_ip4_qualify_rules(stralloc *out,stralloc *fqdn,const stralloc *in,const stralloc *rules)
 {
   unsigned int i;
   unsigned int j;
@@ -63,7 +63,7 @@ int dns_ip4_qualify_rules(stralloc *out,stralloc *fqdn,stralloc *in,stralloc *ru
   }
 }
 
-int dns_ip4_qualify(stralloc *out,stralloc *fqdn,stralloc *in)
+int dns_ip4_qualify(stralloc *out,stralloc *fqdn,const stralloc *in)
 {
   static stralloc rules;
   if (dns_resolvconfrewrite(&rules) == -1) return -1;

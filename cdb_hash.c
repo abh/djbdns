@@ -8,7 +8,7 @@ uint32 cdb_hashadd(uint32 h,unsigned char c)
   return h ^ c;
 }
 
-uint32 cdb_hash(char *buf,unsigned int len)
+uint32 cdb_hash(const char *buf,unsigned int len)
 {
   uint32 h;
 

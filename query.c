@@ -13,9 +13,14 @@
 #include "response.h"
 #include "query.h"
 
-extern int numactive;
+static int flagforwardonly = 0;
 
-static void cachegeneric(char type[2],char *d,char *data,unsigned int datalen,uint32 ttl)
+void query_forwardonly(void)
+{
+  flagforwardonly = 1;
+}
+
+static void cachegeneric(const char type[2],const char *d,const char *data,unsigned int datalen,uint32 ttl)
 {
   unsigned int len;
   char key[257];
@@ -40,7 +45,7 @@ static void save_start(void)
   save_ok = 1;
 }
 
-static void save_data(char *buf,unsigned int len)
+static void save_data(const char *buf,unsigned int len)
 {
   if (!save_ok) return;
   if (len > (sizeof save_buf) - save_len) { save_ok = 0; return; }
@@ -48,14 +53,14 @@ static void save_data(char *buf,unsigned int len)
   save_len += len;
 }
 
-static void save_finish(char type[2],char *d,uint32 ttl)
+static void save_finish(const char type[2],const char *d,uint32 ttl)
 {
   if (!save_ok) return;
   cachegeneric(type,d,save_buf,save_len,ttl);
 }
 
 
-static int typematch(char rtype[2],char qtype[2])
+static int typematch(const char rtype[2],const char qtype[2])
 {
   return byte_equal(qtype,2,rtype) || byte_equal(qtype,2,DNS_T_ANY);
 }
@@ -94,10 +99,10 @@ static int rqa(struct query *z)
     if (z->alias[i]) {
       if (!response_query(z->alias[i],z->type)) return 0;
       while (i > 0) {
-        if (!response_cname(z->alias[i],z->alias[i - 1])) return 0;
+        if (!response_cname(z->alias[i],z->alias[i - 1],z->aliasttl[i])) return 0;
         --i;
       }
-      if (!response_cname(z->alias[0],z->name[0])) return 0;
+      if (!response_cname(z->alias[0],z->name[0],z->aliasttl[0])) return 0;
       return 1;
     }
 
@@ -152,8 +157,6 @@ static int smaller(char *buf,unsigned int len,unsigned int pos1,unsigned int pos
   return 0;
 }
 
-static uint64 query_count = 0;
-
 static int doit(struct query *z,int state)
 {
   char key[257];
@@ -161,7 +164,7 @@ static int doit(struct query *z,int state)
   unsigned int cachedlen;
   char *buf;
   unsigned int len;
-  char *whichserver;
+  const char *whichserver;
   char header[12];
   char misc[20];
   unsigned int rcode;
@@ -176,7 +179,7 @@ static int doit(struct query *z,int state)
   uint16 datalen;
   char *control;
   char *d;
-  char *dtype;
+  const char *dtype;
   unsigned int dlen;
   int flagout;
   int flagcname;
@@ -184,6 +187,7 @@ static int doit(struct query *z,int state)
   int flagsoa;
   uint32 ttl;
   uint32 soattl;
+  uint32 cnamettl;
   int i;
   int j;
   int k;
@@ -216,7 +220,7 @@ static int doit(struct query *z,int state)
     }
     if (!rqa(z)) goto DIE;
     if (typematch(DNS_T_A,dtype)) {
-      if (!response_rstart(d,DNS_T_A,"\0\0\0\0")) goto DIE;
+      if (!response_rstart(d,DNS_T_A,655360)) goto DIE;
       if (!response_addbytes(misc,4)) goto DIE;
       response_rfinish(RESPONSE_ANSWER);
     }
@@ -228,11 +232,12 @@ static int doit(struct query *z,int state)
     if (z->level) goto LOWERLEVEL;
     if (!rqa(z)) goto DIE;
     if (typematch(DNS_T_PTR,dtype)) {
-      if (!response_rstart(d,DNS_T_PTR,"\0\0\0\0")) goto DIE;
+      if (!response_rstart(d,DNS_T_PTR,655360)) goto DIE;
       if (!response_addname("\011localhost\0")) goto DIE;
       response_rfinish(RESPONSE_ANSWER);
     }
     cleanup(z);
+    log_stats();
     return 1;
   }
 
@@ -240,26 +245,26 @@ static int doit(struct query *z,int state)
     byte_copy(key,2,DNS_T_ANY);
     byte_copy(key + 2,dlen,d);
     case_lowerb(key + 2,dlen);
-    cached = cache_get(key,dlen + 2,&cachedlen);
+    cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
     if (cached) {
       log_cachednxdomain(d);
       goto NXDOMAIN;
     }
 
     byte_copy(key,2,DNS_T_AXFR);
-    cached = cache_get(key,dlen + 2,&cachedlen);
+    cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
     if (cached) {
       log_cachedservfail(d);
       goto SERVFAIL;
     }
 
     byte_copy(key,2,DNS_T_CNAME);
-    cached = cache_get(key,dlen + 2,&cachedlen);
+    cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
     if (cached) {
       if (typematch(DNS_T_CNAME,dtype)) {
         log_cachedanswer(d,DNS_T_CNAME);
         if (!rqa(z)) goto DIE;
-	if (!response_cname(z->name[0],cached)) goto DIE;
+	if (!response_cname(z->name[0],cached,ttl)) goto DIE;
 	cleanup(z);
 	return 1;
       }
@@ -270,13 +275,13 @@ static int doit(struct query *z,int state)
 
     if (typematch(DNS_T_NS,dtype)) {
       byte_copy(key,2,DNS_T_NS);
-      cached = cache_get(key,dlen + 2,&cachedlen);
+      cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
       if (cached && (cachedlen || byte_diff(dtype,2,DNS_T_ANY))) {
 	log_cachedanswer(d,DNS_T_NS);
 	if (!rqa(z)) goto DIE;
 	pos = 0;
 	while (pos = dns_packet_getname(cached,cachedlen,pos,&t2)) {
-	  if (!response_rstart(d,DNS_T_NS,"\0\0\0\0")) goto DIE;
+	  if (!response_rstart(d,DNS_T_NS,ttl)) goto DIE;
 	  if (!response_addname(t2)) goto DIE;
 	  response_rfinish(RESPONSE_ANSWER);
 	}
@@ -287,13 +292,13 @@ static int doit(struct query *z,int state)
 
     if (typematch(DNS_T_PTR,dtype)) {
       byte_copy(key,2,DNS_T_PTR);
-      cached = cache_get(key,dlen + 2,&cachedlen);
+      cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
       if (cached && (cachedlen || byte_diff(dtype,2,DNS_T_ANY))) {
 	log_cachedanswer(d,DNS_T_PTR);
 	if (!rqa(z)) goto DIE;
 	pos = 0;
 	while (pos = dns_packet_getname(cached,cachedlen,pos,&t2)) {
-	  if (!response_rstart(d,DNS_T_PTR,"\0\0\0\0")) goto DIE;
+	  if (!response_rstart(d,DNS_T_PTR,ttl)) goto DIE;
 	  if (!response_addname(t2)) goto DIE;
 	  response_rfinish(RESPONSE_ANSWER);
 	}
@@ -304,7 +309,7 @@ static int doit(struct query *z,int state)
 
     if (typematch(DNS_T_MX,dtype)) {
       byte_copy(key,2,DNS_T_MX);
-      cached = cache_get(key,dlen + 2,&cachedlen);
+      cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
       if (cached && (cachedlen || byte_diff(dtype,2,DNS_T_ANY))) {
 	log_cachedanswer(d,DNS_T_MX);
 	if (!rqa(z)) goto DIE;
@@ -312,7 +317,7 @@ static int doit(struct query *z,int state)
 	while (pos = dns_packet_copy(cached,cachedlen,pos,misc,2)) {
 	  pos = dns_packet_getname(cached,cachedlen,pos,&t2);
 	  if (!pos) break;
-	  if (!response_rstart(d,DNS_T_MX,"\0\0\0\0")) goto DIE;
+	  if (!response_rstart(d,DNS_T_MX,ttl)) goto DIE;
 	  if (!response_addbytes(misc,2)) goto DIE;
 	  if (!response_addname(t2)) goto DIE;
 	  response_rfinish(RESPONSE_ANSWER);
@@ -324,7 +329,7 @@ static int doit(struct query *z,int state)
 
     if (typematch(DNS_T_A,dtype)) {
       byte_copy(key,2,DNS_T_A);
-      cached = cache_get(key,dlen + 2,&cachedlen);
+      cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
       if (cached && (cachedlen || byte_diff(dtype,2,DNS_T_ANY))) {
 	if (z->level) {
 	  log_cachedanswer(d,DNS_T_A);
@@ -343,7 +348,7 @@ static int doit(struct query *z,int state)
 	log_cachedanswer(d,DNS_T_A);
 	if (!rqa(z)) goto DIE;
 	while (cachedlen >= 4) {
-	  if (!response_rstart(d,DNS_T_A,"\0\0\0\0")) goto DIE;
+	  if (!response_rstart(d,DNS_T_A,ttl)) goto DIE;
 	  if (!response_addbytes(cached,4)) goto DIE;
 	  response_rfinish(RESPONSE_ANSWER);
 	  cached += 4;
@@ -356,7 +361,7 @@ static int doit(struct query *z,int state)
 
     if (!typematch(DNS_T_ANY,dtype) && !typematch(DNS_T_AXFR,dtype) && !typematch(DNS_T_CNAME,dtype) && !typematch(DNS_T_NS,dtype) && !typematch(DNS_T_PTR,dtype) && !typematch(DNS_T_A,dtype) && !typematch(DNS_T_MX,dtype)) {
       byte_copy(key,2,dtype);
-      cached = cache_get(key,dlen + 2,&cachedlen);
+      cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
       if (cached && (cachedlen || byte_diff(dtype,2,DNS_T_ANY))) {
 	log_cachedanswer(d,dtype);
 	if (!rqa(z)) goto DIE;
@@ -365,7 +370,7 @@ static int doit(struct query *z,int state)
 	  cached += 2;
 	  cachedlen -= 2;
 	  if (datalen > cachedlen) goto DIE;
-	  if (!response_rstart(d,dtype,"\0\0\0\0")) goto DIE;
+	  if (!response_rstart(d,dtype,ttl)) goto DIE;
 	  if (!response_addbytes(cached,datalen)) goto DIE;
 	  response_rfinish(RESPONSE_ANSWER);
 	  cached += datalen;
@@ -385,12 +390,12 @@ static int doit(struct query *z,int state)
       break;
     }
 
-    if (z->level < 2)
+    if (!flagforwardonly && (z->level < 2))
       if (dlen < 255) {
         byte_copy(key,2,DNS_T_NS);
         byte_copy(key + 2,dlen,d);
         case_lowerb(key + 2,dlen);
-        cached = cache_get(key,dlen + 2,&cachedlen);
+        cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
         if (cached && cachedlen) {
 	  z->control[z->level] = d;
           byte_zero(z->servers[z->level],64);
@@ -434,11 +439,11 @@ static int doit(struct query *z,int state)
   dns_sortip(z->servers[z->level],64);
   if (z->level) {
     log_tx(z->name[z->level],DNS_T_A,z->control[z->level],z->servers[z->level],z->level);
-    if (dns_transmit_start(&z->dt,z->servers[z->level],0,z->name[z->level],DNS_T_A,z->localip) == -1) goto DIE;
+    if (dns_transmit_start(&z->dt,z->servers[z->level],flagforwardonly,z->name[z->level],DNS_T_A,z->localip) == -1) goto DIE;
   }
   else {
     log_tx(z->name[0],z->type,z->control[0],z->servers[0],0);
-    if (dns_transmit_start(&z->dt,z->servers[0],0,z->name[0],z->type,z->localip) == -1) goto DIE;
+    if (dns_transmit_start(&z->dt,z->servers[0],flagforwardonly,z->name[0],z->type,z->localip) == -1) goto DIE;
   }
   return 0;
 
@@ -478,18 +483,21 @@ static int doit(struct query *z,int state)
   flagreferral = 0;
   flagsoa = 0;
   soattl = 0;
+  cnamettl = 0;
   for (j = 0;j < numanswers;++j) {
     pos = dns_packet_getname(buf,len,pos,&t1); if (!pos) goto DIE;
     pos = dns_packet_copy(buf,len,pos,header,10); if (!pos) goto DIE;
 
     if (dns_domain_equal(t1,d))
-      if (byte_equal(header + 2,2,DNS_C_IN)) /* should always be true */
+      if (byte_equal(header + 2,2,DNS_C_IN)) { /* should always be true */
         if (typematch(header,dtype))
           flagout = 1;
         else if (typematch(header,DNS_T_CNAME)) {
           if (!dns_packet_getname(buf,len,pos,&cname)) goto DIE;
           flagcname = 1;
+	  cnamettl = ttlget(header + 4);
         }
+      }
   
     uint16_unpack_big(header + 8,&datalen);
     pos += datalen;
@@ -672,12 +680,16 @@ static int doit(struct query *z,int state)
 
 
   if (flagcname) {
+    ttl = cnamettl;
     CNAME:
     if (!z->level) {
       if (z->alias[QUERY_MAXALIAS - 1]) goto DIE;
       for (j = QUERY_MAXALIAS - 1;j > 0;--j)
         z->alias[j] = z->alias[j - 1];
+      for (j = QUERY_MAXALIAS - 1;j > 0;--j)
+        z->aliasttl[j] = z->aliasttl[j - 1];
       z->alias[0] = z->name[0];
+      z->aliasttl[0] = ttl;
       z->name[0] = 0;
     }
     if (!dns_domain_copy(&z->name[z->level],cname)) goto DIE;
@@ -705,7 +717,7 @@ static int doit(struct query *z,int state)
 	  log_nodata(whichserver,d,dtype,soattl);
         }
 
-  log_stats(&query_count,&cache_motion,&numactive);
+  log_stats();
 
 
   if (flagout || flagsoa || !flagreferral) {
@@ -735,11 +747,12 @@ static int doit(struct query *z,int state)
     for (j = 0;j < numanswers;++j) {
       pos = dns_packet_getname(buf,len,pos,&t1); if (!pos) goto DIE;
       pos = dns_packet_copy(buf,len,pos,header,10); if (!pos) goto DIE;
+      ttl = ttlget(header + 4);
       uint16_unpack_big(header + 8,&datalen);
       if (dns_domain_equal(t1,d))
         if (byte_equal(header + 2,2,DNS_C_IN)) /* should always be true */
           if (typematch(header,dtype)) {
-            if (!response_rstart(t1,header,"\0\0\0\0")) goto DIE;
+            if (!response_rstart(t1,header,ttl)) goto DIE;
   
             if (typematch(header,DNS_T_NS) || typematch(header,DNS_T_CNAME) || typematch(header,DNS_T_PTR)) {
               if (!dns_packet_getname(buf,len,pos,&t2)) goto DIE;
@@ -775,8 +788,8 @@ static int doit(struct query *z,int state)
   }
 
 
-  control = dns_domain_suffix(d,referral);
-  if (!control) goto DIE;
+  if (!dns_domain_suffix(d,referral)) goto DIE;
+  control = d + dns_domain_suffixpos(d,referral);
   z->control[z->level] = control;
   byte_zero(z->servers[z->level],64);
   for (j = 0;j < QUERY_MAXNS;++j)
@@ -815,8 +828,6 @@ static int doit(struct query *z,int state)
 
 int query_start(struct query *z,char *dn,char type[2],char localip[4])
 {
-  ++query_count;
-
   if (byte_equal(type,2,DNS_T_AXFR)) { errno = error_perm; return -1; }
 
   cleanup(z);

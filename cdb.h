@@ -7,7 +7,7 @@
 
 #define CDB_HASHSTART 5381
 extern uint32 cdb_hashadd(uint32,unsigned char);
-extern uint32 cdb_hash(char *,unsigned int);
+extern uint32 cdb_hash(const char *,unsigned int);
 
 struct cdb {
   char *map; /* 0 if no map is available */
@@ -28,8 +28,8 @@ extern void cdb_init(struct cdb *,int fd);
 extern int cdb_read(struct cdb *,char *,unsigned int,uint32);
 
 extern void cdb_findstart(struct cdb *);
-extern int cdb_findnext(struct cdb *,char *,unsigned int);
-extern int cdb_find(struct cdb *,char *,unsigned int);
+extern int cdb_findnext(struct cdb *,const char *,unsigned int);
+extern int cdb_find(struct cdb *,const char *,unsigned int);
 
 #define cdb_datapos(c) ((c)->dpos)
 #define cdb_datalen(c) ((c)->dlen)

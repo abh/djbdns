@@ -7,9 +7,9 @@
 
 static char *d;
 
-unsigned int printrecord_cat(stralloc *out,char *buf,unsigned int len,unsigned int pos,char *q,char qtype[2])
+unsigned int printrecord_cat(stralloc *out,const char *buf,unsigned int len,unsigned int pos,const char *q,const char qtype[2])
 {
-  char *x;
+  const char *x;
   char misc[20];
   uint16 datalen;
   uint16 u16;
@@ -108,7 +108,7 @@ unsigned int printrecord_cat(stralloc *out,char *buf,unsigned int len,unsigned i
   return newpos;
 }
 
-unsigned int printrecord(stralloc *out,char *buf,unsigned int len,unsigned int pos,char *q,char qtype[2])
+unsigned int printrecord(stralloc *out,const char *buf,unsigned int len,unsigned int pos,const char *q,const char qtype[2])
 {
   if (!stralloc_copys(out,"")) return 0;
   return printrecord_cat(out,buf,len,pos,q,qtype);

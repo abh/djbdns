@@ -296,3 +296,46 @@
 		dnsroots.local, then dnsroots.global.
 	ui: no longer install home/etc/dnscache.
 	version: djbdns 1.02.
+20001224
+	ui: new dnstrace output format.
+	ui: dnstrace shows all servers providing each ns/a line.
+	ui: added dnstracesort.
+20001225
+	internal: response_rstart() and response_cname() use uint32 ttl.
+	internal: added response_hidettl().
+	internal: cache_get() returns ttl.
+	internal: dnscache keeps track of ttls for aliases.
+	ui: dnscache returns ttl unless $HIDETTL is set.
+	ui: dnscache returns ttl 655360 for localhost et al.
+20001226
+	ui: dnscache supports $FORWARDONLY. tnx to several people for
+		the suggestion. tnx Dan Peterson for sample code.
+	ui: dnscache now logs sequential query numbers, not indices.
+	internal: revamped dnscache to separate udp from tcp.
+	ui: dnscache reports uactive, tactive separately.
+	ui: dnscache reports tcpopen/tcpclose by port and ip.
+	ui: dnscache artificially times out oldest UDP query if UDP
+		table is full, and oldest TCP connection if TCP table is
+		full.
+	ui: dnscache reports broken pipe when a TCP client sends FIN.
+20001228
+	ui: dnstrace supports dd.
+	ui: dnscache logs stats when it handles 1.0.0.127.in-addr.arpa.
+	ui: pickdns actively refuses queries for unknown types.
+	ui: pickdns responds to MX queries. tnx Mike Batchelor.
+	internal: added const at various places.
+	internal: removed some unused variables.
+	internal: used time_t in tai_now.c.
+	internal: used stdlib.h in alloc.c.
+	api: split dns_domain_suffix() into suffix(), suffixpos().
+	internal: switched to buffer_unix*.
+	internal: included unistd.h for various declarations.
+20010103
+	ui: increased maximum data size from 512 bytes to 32767 bytes in
+		tinydns, tinydns-get, axfrdns. allows big TXT records.
+	ui: dnsmx reformats name when it prints an artificial 0 MX.
+20010105
+	ui: increased MAXLEVEL to 5. the Internet is becoming more
+		glueless every day.
+20010106
+	version: djbdns 1.03.

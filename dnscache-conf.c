@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "hasdevtcp.h"
@@ -12,7 +13,6 @@
 #include "str.h"
 #include "open.h"
 #include "error.h"
-#include "readwrite.h"
 #include "exit.h"
 #include "auto_home.h"
 #include "generic-conf.h"
@@ -32,7 +32,7 @@ char *dir;
 char *user;
 char *loguser;
 struct passwd *pw;
-char *myip;
+const char *myip;
 
 uint32 seed[32];
 int seedpos = 0;
@@ -63,7 +63,7 @@ void seed_addtime(void)
     seed_adduint32(tpack[i]);
 }
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   seed_addtime();
   seed_adduint32(getpid());
@@ -138,7 +138,7 @@ main(int argc,char **argv)
   seed_addtime(); makedir("root/servers");
   seed_addtime(); perm(02755);
   seed_addtime(); start("root/servers/@");
-  buffer_init(&ssrootservers,read,fdrootservers,rootserversbuf,sizeof rootserversbuf);
+  buffer_init(&ssrootservers,buffer_unixread,fdrootservers,rootserversbuf,sizeof rootserversbuf);
   copyfrom(&ssrootservers);
   finish();
   seed_addtime(); perm(0644);

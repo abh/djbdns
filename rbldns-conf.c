@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <pwd.h>
 #include "strerr.h"
 #include "exit.h"
@@ -18,7 +19,7 @@ struct passwd *pw;
 char *myip;
 char *base;
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   user = argv[1];
   if (!user) usage();

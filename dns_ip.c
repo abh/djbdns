@@ -3,7 +3,7 @@
 #include "byte.h"
 #include "dns.h"
 
-int dns_ip4_packet(stralloc *out,char *buf,unsigned int len)
+int dns_ip4_packet(stralloc *out,const char *buf,unsigned int len)
 {
   unsigned int pos;
   char header[12];
@@ -36,7 +36,7 @@ int dns_ip4_packet(stralloc *out,char *buf,unsigned int len)
 
 static char *q = 0;
 
-int dns_ip4(stralloc *out,stralloc *fqdn)
+int dns_ip4(stralloc *out,const stralloc *fqdn)
 {
   unsigned int i;
   char code;

@@ -2,7 +2,7 @@
 
 /* XXX: breaks tai encapsulation */
 
-void taia_sub(struct taia *t,struct taia *u,struct taia *v)
+void taia_sub(struct taia *t,const struct taia *u,const struct taia *v)
 {
   unsigned long unano = u->nano;
   unsigned long uatto = u->atto;

@@ -1,6 +1,6 @@
 #include "tai.h"
 
-void tai_unpack(char *s,struct tai *t)
+void tai_unpack(const char *s,struct tai *t)
 {
   uint64 x;
 

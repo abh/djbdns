@@ -45,6 +45,7 @@ random-ip.c
 dnsqr.c
 dnsq.c
 dnstrace.c
+dnstracesort.sh
 utime.c
 cachetest.c
 generic-conf.h
@@ -161,7 +162,6 @@ prot.c
 prot.h
 readclose.c
 readclose.h
-readwrite.h
 scan.h
 scan_ulong.c
 seek.h
@@ -238,3 +238,5 @@ uint32_unpack.c
 uint64.h1
 uint64.h2
 warn-shsgr
+buffer_read.c
+buffer_write.c

@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "uint16.h"
@@ -7,7 +9,8 @@
 #include "fmt.h"
 #include "ip4.h"
 #include "exit.h"
-#include "readwrite.h"
+#include "case.h"
+#include "scan.h"
 #include "buffer.h"
 #include "strerr.h"
 #include "getln.h"
@@ -98,15 +101,15 @@ struct cdb_make cdb;
 static stralloc key;
 static stralloc result;
 
-void rr_add(char *buf,unsigned int len)
+void rr_add(const char *buf,unsigned int len)
 {
   if (!stralloc_catb(&result,buf,len)) nomem();
 }
-void rr_addname(char *d)
+void rr_addname(const char *d)
 {
   rr_add(d,dns_domain_length(d));
 }
-void rr_start(char type[2],unsigned long ttl,char ttd[8])
+void rr_start(const char type[2],unsigned long ttl,const char ttd[8])
 {
   char buf[4];
   if (!stralloc_copyb(&result,type,2)) nomem();
@@ -115,7 +118,7 @@ void rr_start(char type[2],unsigned long ttl,char ttd[8])
   rr_add(buf,4);
   rr_add(ttd,8);
 }
-void rr_finish(char *owner)
+void rr_finish(const char *owner)
 {
   if (byte_equal(owner,2,"\1*")) {
     owner += 2;
@@ -143,13 +146,13 @@ char dptr[DNS_NAME4_DOMAIN];
 
 char strnum[FMT_ULONG];
 
-void syntaxerror(char *why)
+void syntaxerror(const char *why)
 {
   strnum[fmt_ulong(strnum,linenum)] = 0;
   strerr_die4x(111,FATAL,"unable to parse data line ",strnum,why);
 }
 
-main()
+int main()
 {
   int fddata;
   int i;
@@ -171,7 +174,7 @@ main()
     strerr_die2sys(111,FATAL,"unable to open data: ");
   defaultsoa_init(fddata);
 
-  buffer_init(&b,read,fddata,bspace,sizeof bspace);
+  buffer_init(&b,buffer_unixread,fddata,bspace,sizeof bspace);
 
   fdcdb = open_trunc("data.tmp");
   if (fdcdb == -1) die_datatmp();

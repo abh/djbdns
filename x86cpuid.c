@@ -5,7 +5,7 @@ void nope()
   exit(1);
 }
 
-main()
+int main()
 {
   unsigned long x[4];
   unsigned long y[4];

@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <unistd.h>
 #include "uint32.h"
 #include "uint16.h"
 #include "stralloc.h"
@@ -5,13 +7,14 @@
 #include "strerr.h"
 #include "getln.h"
 #include "buffer.h"
-#include "readwrite.h"
 #include "exit.h"
 #include "open.h"
 #include "scan.h"
 #include "byte.h"
 #include "str.h"
 #include "ip4.h"
+#include "timeoutread.h"
+#include "timeoutwrite.h"
 #include "dns.h"
 
 #define FATAL "axfr-get: fatal: "
@@ -249,7 +252,7 @@ unsigned int doit(char *buf,unsigned int len,unsigned int pos)
 
 stralloc packet;
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
   char out[20];
   unsigned long u;
@@ -276,7 +279,7 @@ main(int argc,char **argv)
     if (errno != error_noent) die_read();
   }
   else {
-    buffer_init(&b,read,fd,bspace,sizeof bspace);
+    buffer_init(&b,buffer_unixread,fd,bspace,sizeof bspace);
     if (getln(&b,&line,&match,'\n') == -1) die_read();
     if (!stralloc_0(&line)) die_read();
     if (line.s[0] == '#') {
@@ -329,7 +332,7 @@ main(int argc,char **argv)
 
   fd = open_trunc(fntmp);
   if (fd == -1) die_write();
-  buffer_init(&b,write,fd,bspace,sizeof bspace);
+  buffer_init(&b,buffer_unixwrite,fd,bspace,sizeof bspace);
 
   if (!stralloc_copyb(&packet,"\0\0\0\0\0\1\0\0\0\0\0\0",12)) die_generate();
   if (!stralloc_catb(&packet,zone,zonelen)) die_generate();

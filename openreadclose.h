@@ -3,6 +3,6 @@
 
 #include "stralloc.h"
 
-extern int openreadclose(char *,stralloc *,unsigned int);
+extern int openreadclose(const char *,stralloc *,unsigned int);
 
 #endif
