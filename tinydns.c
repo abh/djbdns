@@ -1,6 +1,7 @@
 #include "dns.h"
 
 const char *fatal = "tinydns: fatal: ";
+const char *starting = "starting tinydns\n";
 
 static char seed[128];
 

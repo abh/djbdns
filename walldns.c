@@ -4,6 +4,7 @@
 #include "response.h"
 
 const char *fatal = "walldns: fatal: ";
+const char *starting = "starting walldns\n";
 
 void initialize(void)
 {

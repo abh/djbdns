@@ -13,6 +13,8 @@
 #include "ip4.h"
 #include "dns.h"
 
+extern int respond(char *,char *,char *);
+
 #define FATAL "tinydns-get: fatal: "
 
 void usage(void)
@@ -53,7 +55,7 @@ int main(int argc,char **argv)
   if (!dns_domain_todot_cat(&out,q)) oops();
   if (!stralloc_cats(&out,":\n")) oops();
 
-  if (!response_query(q,type)) oops();
+  if (!response_query(q,type,DNS_C_IN)) oops();
   response[3] &= ~128;
   response[2] &= ~1;
   response[2] |= 4;

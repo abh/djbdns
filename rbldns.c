@@ -102,6 +102,7 @@ int respond(char *q,char qtype[2],char ip[4])
 }
 
 const char *fatal = "rbldns: fatal: ";
+const char *starting = "starting rbldns\n";
 
 void initialize(void)
 {

@@ -1,6 +1,7 @@
 #include "byte.h"
 #include "case.h"
 #include "env.h"
+#include "buffer.h"
 #include "strerr.h"
 #include "ip4.h"
 #include "uint16.h"
@@ -12,6 +13,7 @@
 #include "dns.h"
 
 extern char *fatal;
+extern char *starting;
 extern int respond(char *,char *,char *);
 extern void initialize(void);
 
@@ -40,7 +42,7 @@ static int doit(void)
   pos = dns_packet_copy(buf,len,pos,qtype,2); if (!pos) goto NOQ;
   pos = dns_packet_copy(buf,len,pos,qclass,2); if (!pos) goto NOQ;
 
-  if (!response_query(q,qtype)) goto NOQ;
+  if (!response_query(q,qtype,qclass)) goto NOQ;
   response_id(header);
   if (byte_equal(qclass,2,DNS_C_IN))
     response[2] |= 4;
@@ -69,7 +71,6 @@ static int doit(void)
   WEIRDCLASS:
   response[3] &= ~15;
   response[3] |= 1;
-  byte_copy(response + response_len - 2,2,qclass);
   qlog(ip,port,header,q,qtype," C ");
   return 1;
 
@@ -101,6 +102,8 @@ int main()
   
   ndelay_off(udp53);
   socket_tryreservein(udp53,65536);
+
+  buffer_putsflush(buffer_2,starting);
 
   for (;;) {
     len = socket_recv4(udp53,buf,sizeof buf,ip,&port);

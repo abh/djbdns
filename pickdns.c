@@ -7,6 +7,7 @@
 #include "response.h"
 
 const char *fatal = "pickdns: fatal: ";
+const char *starting = "starting pickdns\n";
 
 static char seed[128];
 

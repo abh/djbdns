@@ -359,3 +359,18 @@
 	ui: dnstrace uses a ``start'' IP address for the root glue.
 20010121
 	version: djbdns 1.04.
+20010206
+	internal: response_query() takes a class argument.
+	internal: query_start() takes a class argument.
+	internal: packetquery() takes a class argument.
+	ui: tinydns et al., axfrdns, and dnscache repeat qclass * in
+		response to bogus * queries. tnx Mike Batchelor.
+	ui: axfrdns rejects queries for weird classes.
+	ui: axfrdns uses query ID instead of ID 0 in the series of AXFR
+		response messages between the SOAs, to support the AXFR
+		client in BIND 9.
+	ui: axfrdns sets AA in the series of AXFR response messages.
+20010211
+	ui: servers print starting message.
+	internal: some respond() declarations.
+	version: djbdns 1.05.

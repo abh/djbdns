@@ -771,9 +771,10 @@ choose compile trysysel.c select.h1 select.h2
 	./choose c trysysel select.h1 select.h2 > select.h
 
 server.o: \
-compile server.c byte.h case.h env.h strerr.h ip4.h uint16.h ndelay.h \
-socket.h uint16.h droproot.h qlog.h uint16.h response.h uint32.h \
-dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h taia.h
+compile server.c byte.h case.h env.h buffer.h strerr.h ip4.h uint16.h \
+ndelay.h socket.h uint16.h droproot.h qlog.h uint16.h response.h \
+uint32.h dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h uint64.h \
+taia.h
 	./compile server.c
 
 setup: \

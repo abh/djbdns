@@ -49,14 +49,14 @@ int response_addname(const char *d)
   return response_addbytes(d,1);
 }
 
-int response_query(const char *q,const char qtype[2])
+int response_query(const char *q,const char qtype[2],const char qclass[2])
 {
   response_len = 0;
   name_num = 0;
   if (!response_addbytes("\0\0\201\200\0\1\0\0\0\0\0\0",12)) return 0;
   if (!response_addname(q)) return 0;
   if (!response_addbytes(qtype,2)) return 0;
-  if (!response_addbytes(DNS_C_IN,2)) return 0;
+  if (!response_addbytes(qclass,2)) return 0;
   tctarget = response_len;
   return 1;
 }

@@ -97,7 +97,7 @@ static int rqa(struct query *z)
 
   for (i = QUERY_MAXALIAS - 1;i >= 0;--i)
     if (z->alias[i]) {
-      if (!response_query(z->alias[i],z->type)) return 0;
+      if (!response_query(z->alias[i],z->type,z->class)) return 0;
       while (i > 0) {
         if (!response_cname(z->alias[i],z->alias[i - 1],z->aliasttl[i])) return 0;
         --i;
@@ -106,7 +106,7 @@ static int rqa(struct query *z)
       return 1;
     }
 
-  if (!response_query(z->name[0],z->type)) return 0;
+  if (!response_query(z->name[0],z->type,z->class)) return 0;
   return 1;
 }
 
@@ -818,7 +818,7 @@ static int doit(struct query *z,int state)
   return -1;
 }
 
-int query_start(struct query *z,char *dn,char type[2],char localip[4])
+int query_start(struct query *z,char *dn,char type[2],char class[2],char localip[4])
 {
   if (byte_equal(type,2,DNS_T_AXFR)) { errno = error_perm; return -1; }
 
@@ -828,6 +828,7 @@ int query_start(struct query *z,char *dn,char type[2],char localip[4])
 
   if (!dns_domain_copy(&z->name[0],dn)) return -1;
   byte_copy(z->type,2,type);
+  byte_copy(z->class,2,class);
   byte_copy(z->localip,4,localip);
 
   return doit(z,0);

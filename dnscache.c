@@ -23,10 +23,9 @@
 #include "okclient.h"
 #include "droproot.h"
 
-static int packetquery(char *buf,unsigned int len,char **q,char qtype[2],char id[2])
+static int packetquery(char *buf,unsigned int len,char **q,char qtype[2],char qclass[2],char id[2])
 {
   unsigned int pos;
-  char qclass[2];
   char header[12];
 
   errno = error_proto;
@@ -92,6 +91,7 @@ void u_new(void)
   int len;
   static char *q = 0;
   char qtype[2];
+  char qclass[2];
 
   for (j = 0;j < MAXUDP;++j)
     if (!u[j].active)
@@ -115,11 +115,11 @@ void u_new(void)
   if (x->port < 1024) if (x->port != 53) return;
   if (!okclient(x->ip)) return;
 
-  if (!packetquery(buf,len,&q,qtype,x->id)) return;
+  if (!packetquery(buf,len,&q,qtype,qclass,x->id)) return;
 
   x->active = ++numqueries; ++uactive;
   log_query(&x->active,x->ip,x->port,x->id,q,qtype);
-  switch(query_start(&x->q,q,qtype,myipoutgoing)) {
+  switch(query_start(&x->q,q,qtype,qclass,myipoutgoing)) {
     case -1:
       u_drop(j);
       return;
@@ -210,6 +210,7 @@ void t_rw(int j)
   char ch;
   static char *q = 0;
   char qtype[2];
+  char qclass[2];
   int r;
 
   x = t + j;
@@ -249,11 +250,11 @@ void t_rw(int j)
   x->buf[x->pos++] = ch;
   if (x->pos < x->len) return;
 
-  if (!packetquery(x->buf,x->len,&q,qtype,x->id)) { t_close(j); return; }
+  if (!packetquery(x->buf,x->len,&q,qtype,qclass,x->id)) { t_close(j); return; }
 
   x->active = ++numqueries;
   log_query(&x->active,x->ip,x->port,x->id,q,qtype);
-  switch(query_start(&x->q,q,qtype,myipoutgoing)) {
+  switch(query_start(&x->q,q,qtype,qclass,myipoutgoing)) {
     case -1:
       t_drop(j);
       return;

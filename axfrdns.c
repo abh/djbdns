@@ -22,6 +22,8 @@
 #include "qlog.h"
 #include "response.h"
 
+extern int respond(char *,char *,char *);
+
 #define FATAL "axfrdns: fatal: "
 
 void nomem()
@@ -144,7 +146,7 @@ void doname(stralloc *sa)
   if (!stralloc_catb(sa,d,dns_domain_length(d))) nomem();
 }
 
-int build(stralloc *sa,char *q,int flagsoa)
+int build(stralloc *sa,char *q,int flagsoa,char id[2])
 {
   unsigned int rdatapos;
   char misc[20];
@@ -159,7 +161,8 @@ int build(stralloc *sa,char *q,int flagsoa)
   if (flagsoa) if (byte_diff(type,2,DNS_T_SOA)) return 0;
   if (!flagsoa) if (byte_equal(type,2,DNS_T_SOA)) return 0;
 
-  if (!stralloc_copyb(sa,"\0\0\200\200\0\0\0\1\0\0\0\0",12)) nomem();
+  if (!stralloc_copyb(sa,id,2)) nomem();
+  if (!stralloc_catb(sa,"\204\000\0\0\0\1\0\0\0\0",10)) nomem();
   copy(misc,1);
   if ((misc[0] == '=' + 1) || (misc[0] == '*' + 1)) {
     --misc[0];
@@ -217,7 +220,7 @@ static char *q;
 static stralloc soa;
 static stralloc message;
 
-void doaxfr(void)
+void doaxfr(char id[2])
 {
   char key[512];
   uint32 klen;
@@ -252,7 +255,7 @@ void doaxfr(void)
     dlen = cdb_datalen(&c);
     if (dlen > sizeof data) die_cdbformat();
     if (cdb_read(&c,data,dlen,cdb_datapos(&c)) == -1) die_cdbformat();
-    if (build(&soa,zone,1)) break;
+    if (build(&soa,zone,1,id)) break;
   }
 
   cdb_free(&c);
@@ -286,7 +289,7 @@ void doaxfr(void)
     if (klen < 1) die_cdbformat();
     if (dns_packet_getname(key,klen,0,&q) != klen) die_cdbformat();
     if (!dns_domain_suffix(q,zone)) continue;
-    if (!build(&message,q,0)) continue;
+    if (!build(&message,q,0,id)) continue;
     print(message.s,message.len);
   }
 
@@ -316,6 +319,7 @@ int main()
   unsigned int pos;
   char header[12];
   char qtype[2];
+  char qclass[2];
   const char *x;
 
   droproot(FATAL);
@@ -346,6 +350,10 @@ int main()
     pos = dns_packet_getname(buf,len,pos,&zone); if (!pos) die_truncated();
     zonelen = dns_domain_length(zone);
     pos = dns_packet_copy(buf,len,pos,qtype,2); if (!pos) die_truncated();
+    pos = dns_packet_copy(buf,len,pos,qclass,2); if (!pos) die_truncated();
+
+    if (byte_diff(qclass,2,DNS_C_IN) && byte_diff(qclass,2,DNS_C_ANY))
+      strerr_die2x(111,FATAL,"bogus query: bad class");
 
     qlog(ip,port,header,zone,qtype," ");
 
@@ -353,11 +361,11 @@ int main()
       case_lowerb(zone,zonelen);
       fdcdb = open_read("data.cdb");
       if (fdcdb == -1) die_cdbread();
-      doaxfr();
+      doaxfr(header);
       close(fdcdb);
     }
     else {
-      if (!response_query(zone,qtype)) nomem();
+      if (!response_query(zone,qtype,qclass)) nomem();
       response[2] |= 4;
       case_lowerb(zone,zonelen);
       response_id(header);

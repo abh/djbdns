@@ -6,7 +6,7 @@
 extern char response[];
 extern unsigned int response_len;
 
-extern int response_query(const char *,const char *);
+extern int response_query(const char *,const char *,const char *);
 extern void response_nxdomain(void);
 extern void response_servfail(void);
 extern void response_id(const char *);
