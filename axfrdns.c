@@ -121,6 +121,10 @@ void get(char *buf,unsigned int len)
   }
 }
 
+char ip[4];
+unsigned long port;
+char clientloc[2];
+
 struct tai now;
 char data[32767];
 uint32 dlen;
@@ -145,6 +149,7 @@ int build(stralloc *sa,char *q,int flagsoa)
   unsigned int rdatapos;
   char misc[20];
   char type[2];
+  char recordloc[2];
   char ttl[4];
   char ttd[8];
   struct tai cutoff;
@@ -156,6 +161,11 @@ int build(stralloc *sa,char *q,int flagsoa)
 
   if (!stralloc_copyb(sa,"\0\0\200\200\0\0\0\1\0\0\0\0",12)) nomem();
   copy(misc,1);
+  if ((misc[0] == '=' + 1) || (misc[0] == '*' + 1)) {
+    --misc[0];
+    copy(recordloc,2);
+    if (byte_diff(recordloc,2,clientloc)) return 0;
+  }
   if (misc[0] == '*') {
     if (flagsoa) return 0;
     if (!stralloc_catb(sa,"\1*",2)) nomem();
@@ -220,6 +230,20 @@ void doaxfr(void)
 
   tai_now(&now);
   cdb_init(&c,fdcdb);
+
+  byte_zero(clientloc,2);
+  key[0] = 0;
+  key[1] = '%';
+  byte_copy(key + 2,4,ip);
+  r = cdb_find(&c,key,6);
+  if (!r) r = cdb_find(&c,key,5);
+  if (!r) r = cdb_find(&c,key,4);
+  if (!r) r = cdb_find(&c,key,3);
+  if (!r) r = cdb_find(&c,key,2);
+  if (r == -1) die_cdbread();
+  if (r && (cdb_datalen(&c) == 2))
+    if (cdb_read(&c,clientloc,2,cdb_datapos(&c)) == -1) die_cdbread();
+
   cdb_findstart(&c);
   for (;;) {
     r = cdb_findnext(&c,zone,zonelen);
@@ -230,6 +254,7 @@ void doaxfr(void)
     if (cdb_read(&c,data,dlen,cdb_datapos(&c)) == -1) die_cdbformat();
     if (build(&soa,zone,1)) break;
   }
+
   cdb_free(&c);
   print(soa.s,soa.len);
 
@@ -257,6 +282,7 @@ void doaxfr(void)
     if (dlen > sizeof data) die_cdbformat();
     get(data,dlen);
 
+    if ((klen > 1) && (key[0] == 0)) continue; /* location */
     if (klen < 1) die_cdbformat();
     if (dns_packet_getname(key,klen,0,&q) != klen) die_cdbformat();
     if (!dns_domain_suffix(q,zone)) continue;
@@ -279,12 +305,11 @@ void netread(char *buf,unsigned int len)
   }
 }
 
-char ip[4];
-unsigned long port;
-
 char tcpheader[2];
 char buf[512];
 uint16 len;
+
+static char seed[128];
 
 int main()
 {
@@ -294,6 +319,7 @@ int main()
   const char *x;
 
   droproot(FATAL);
+  dns_random_init(seed);
 
   axfr = env_get("AXFR");
   

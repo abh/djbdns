@@ -1,10 +1,19 @@
-
-sort -t: +0 -2 +4 +3 -4 +2 -3 | awk -F: '
+awk -F: '
+  BEGIN { OFS=":" }
   {
-    if ($5 == "A") next
-    if ($5 == "NS") next
     if ($5 == "tx") next
-
+    if ($5 == "A") {
+      print "glue",$6,$3,$4,"answer",$6" A "$7
+      next
+    }
+    if ($5 == "NS") {
+      print "glue",$6,$3,$4,"answer",$6" NS "$7
+      next
+    }
+    print
+  }
+' | sort -t: +0 -2 +4 +3 -4 +2 -3 | uniq | awk -F: '
+  {
     type = $1
     q = $2
     c = $3

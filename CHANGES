@@ -339,3 +339,23 @@
 		glueless every day.
 20010106
 	version: djbdns 1.03.
+20010113
+	ui: increased MAXALIAS to 16.
+	ui: dnscache no longer caches SERVFAIL. per-ip is obviously the
+		way to go.
+	ui: tinydns et al. now respond FORMERR to non-Internet-class
+		queries.
+	ui: tdlookup now returns A records in a random order in the
+		answer section, and truncates the list after 8 records.
+	ui: tinydns-data skips lines starting -.
+20010114
+	internal: documented the tinydns data.cdb format.
+	ui: tinydns-data, tinydns, tinydns-get, axfrdns support client
+		differentiation.
+	ui: dnsqr aborts if it is given an extra argument.
+20010117
+	ui: dnstracesort removes duplicate lines.
+	ui: dnstracesort prints glue.
+	ui: dnstrace uses a ``start'' IP address for the root glue.
+20010121
+	version: djbdns 1.04.

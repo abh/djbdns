@@ -979,10 +979,10 @@ timeoutwrite.h
 
 tinydns: \
 load tinydns.o server.o droproot.o tdlookup.o response.o qlog.o \
-prot.o libtai.a dns.a env.a cdb.a alloc.a buffer.a unix.a byte.a \
+prot.o dns.a libtai.a env.a cdb.a alloc.a buffer.a unix.a byte.a \
 socket.lib
 	./load tinydns server.o droproot.o tdlookup.o response.o \
-	qlog.o prot.o libtai.a dns.a env.a cdb.a alloc.a buffer.a \
+	qlog.o prot.o dns.a libtai.a env.a cdb.a alloc.a buffer.a \
 	unix.a byte.a  `cat socket.lib`
 
 tinydns-conf: \
@@ -1019,20 +1019,21 @@ dns.h stralloc.h iopause.h taia.h tai.h uint64.h taia.h
 
 tinydns-get: \
 load tinydns-get.o tdlookup.o response.o printpacket.o printrecord.o \
-parsetype.o libtai.a cdb.a dns.a buffer.a alloc.a unix.a byte.a
+parsetype.o dns.a libtai.a cdb.a buffer.a alloc.a unix.a byte.a
 	./load tinydns-get tdlookup.o response.o printpacket.o \
-	printrecord.o parsetype.o libtai.a cdb.a dns.a buffer.a \
+	printrecord.o parsetype.o dns.a libtai.a cdb.a buffer.a \
 	alloc.a unix.a byte.a 
 
 tinydns-get.o: \
 compile tinydns-get.c str.h byte.h scan.h exit.h stralloc.h \
 gen_alloc.h buffer.h strerr.h uint16.h response.h uint32.h case.h \
-printpacket.h stralloc.h parsetype.h dns.h stralloc.h iopause.h \
+printpacket.h stralloc.h parsetype.h ip4.h dns.h stralloc.h iopause.h \
 taia.h tai.h uint64.h taia.h
 	./compile tinydns-get.c
 
 tinydns.o: \
-compile tinydns.c
+compile tinydns.c dns.h stralloc.h gen_alloc.h iopause.h taia.h tai.h \
+uint64.h taia.h
 	./compile tinydns.c
 
 uint16_pack.o: \
@@ -1063,15 +1064,15 @@ choose compile load tryulong64.c uint64.h1 uint64.h2
 	./choose clr tryulong64 uint64.h1 uint64.h2 > uint64.h
 
 unix.a: \
-makelib error.o error_str.o ndelay_off.o ndelay_on.o open_read.o \
-open_trunc.o openreadclose.o readclose.o seek_set.o socket_accept.o \
-socket_bind.o socket_conn.o socket_listen.o socket_recv.o \
-socket_send.o socket_tcp.o socket_udp.o buffer_read.o buffer_write.o
-	./makelib unix.a error.o error_str.o ndelay_off.o \
-	ndelay_on.o open_read.o open_trunc.o openreadclose.o \
-	readclose.o seek_set.o socket_accept.o socket_bind.o \
-	socket_conn.o socket_listen.o socket_recv.o socket_send.o \
-	socket_tcp.o socket_udp.o buffer_read.o buffer_write.o
+makelib buffer_read.o buffer_write.o error.o error_str.o ndelay_off.o \
+ndelay_on.o open_read.o open_trunc.o openreadclose.o readclose.o \
+seek_set.o socket_accept.o socket_bind.o socket_conn.o \
+socket_listen.o socket_recv.o socket_send.o socket_tcp.o socket_udp.o
+	./makelib unix.a buffer_read.o buffer_write.o error.o \
+	error_str.o ndelay_off.o ndelay_on.o open_read.o \
+	open_trunc.o openreadclose.o readclose.o seek_set.o \
+	socket_accept.o socket_bind.o socket_conn.o socket_listen.o \
+	socket_recv.o socket_send.o socket_tcp.o socket_udp.o
 
 utime: \
 load utime.o byte.a

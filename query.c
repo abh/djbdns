@@ -197,7 +197,6 @@ static int doit(struct query *z,int state)
   errno = error_io;
   if (state == 1) goto HAVEPACKET;
   if (state == -1) {
-    cachegeneric(DNS_T_AXFR,z->name[z->level],"",0,60);
     log_servfail(z->name[z->level]);
     goto SERVFAIL;
   }
@@ -249,13 +248,6 @@ static int doit(struct query *z,int state)
     if (cached) {
       log_cachednxdomain(d);
       goto NXDOMAIN;
-    }
-
-    byte_copy(key,2,DNS_T_AXFR);
-    cached = cache_get(key,dlen + 2,&cachedlen,&ttl);
-    if (cached) {
-      log_cachedservfail(d);
-      goto SERVFAIL;
     }
 
     byte_copy(key,2,DNS_T_CNAME);

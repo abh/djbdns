@@ -10,20 +10,22 @@
 #include "case.h"
 #include "printpacket.h"
 #include "parsetype.h"
+#include "ip4.h"
 #include "dns.h"
 
 #define FATAL "tinydns-get: fatal: "
 
 void usage(void)
 {
-  strerr_die1x(100,"tinydns-get: usage: tinydns-get type name");
+  strerr_die1x(100,"tinydns-get: usage: tinydns-get type name [ip]");
 }
 void oops(void)
 {
   strerr_die2sys(111,FATAL,"unable to parse: ");
 }
 
-char type[2];
+static char ip[4];
+static char type[2];
 static char *q;
 
 static stralloc out;
@@ -39,6 +41,10 @@ int main(int argc,char **argv)
 
   if (!*++argv) usage();
   if (!dns_domain_fromdot(&q,*argv,str_len(*argv))) oops();
+
+  if (*++argv) {
+    if (!ip4_scan(*argv,ip)) usage();
+  }
 
   if (!stralloc_copys(&out,"")) oops();
   uint16_unpack_big(type,&u16);
@@ -58,7 +64,7 @@ int main(int argc,char **argv)
     response[3] |= 4;
   }
   else
-    if (!respond(q,type,"\0\0\0\0")) goto DONE;
+    if (!respond(q,type,ip)) goto DONE;
 
   if (!printpacket_cat(&out,response,response_len)) oops();
 

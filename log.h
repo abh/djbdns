@@ -15,7 +15,6 @@ extern void log_tcpclose(const char *,unsigned int);
 extern void log_cachedanswer(const char *,const char *);
 extern void log_cachedcname(const char *,const char *);
 extern void log_cachednxdomain(const char *);
-extern void log_cachedservfail(const char *);
 extern void log_cachedns(const char *,const char *);
 
 extern void log_tx(const char *,const char *,const char *,const char *,unsigned int);

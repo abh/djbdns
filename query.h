@@ -5,7 +5,7 @@
 #include "uint32.h"
 
 #define QUERY_MAXLEVEL 5
-#define QUERY_MAXALIAS 4
+#define QUERY_MAXALIAS 16
 #define QUERY_MAXNS 16
 
 struct query {

@@ -41,6 +41,8 @@ int main(int argc,char **argv)
   if (!*++argv) usage();
   if (!dns_domain_fromdot(&q,*argv,str_len(*argv))) oops();
 
+  if (*++argv) usage();
+
   if (!stralloc_copys(&out,"")) oops();
   uint16_unpack_big(type,&u16);
   if (!stralloc_catulong0(&out,u16,0)) oops();

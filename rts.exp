@@ -190,47 +190,6 @@ dnsname: fatal: unable to parse IP address 1.2.3
 127.5.6.7+one two three
 10+one two three
 0
---- tinydns-data does not complain about large packets
-0
-1 www.movie.edu:
-591 bytes, 1+35+0+0 records, response, authoritative, noerror
-query: 1 www.movie.edu
-answer: www.movie.edu 86400 A 1.2.3.5
-answer: www.movie.edu 86400 A 1.2.3.6
-answer: www.movie.edu 86400 A 1.2.3.7
-answer: www.movie.edu 86400 A 1.2.3.8
-answer: www.movie.edu 86400 A 1.2.3.9
-answer: www.movie.edu 86400 A 1.2.3.10
-answer: www.movie.edu 86400 A 1.2.3.11
-answer: www.movie.edu 86400 A 1.2.3.12
-answer: www.movie.edu 86400 A 1.2.3.13
-answer: www.movie.edu 86400 A 1.2.3.14
-answer: www.movie.edu 86400 A 1.2.3.15
-answer: www.movie.edu 86400 A 1.2.3.16
-answer: www.movie.edu 86400 A 1.2.3.17
-answer: www.movie.edu 86400 A 1.2.3.18
-answer: www.movie.edu 86400 A 1.2.3.19
-answer: www.movie.edu 86400 A 1.2.3.20
-answer: www.movie.edu 86400 A 1.2.3.21
-answer: www.movie.edu 86400 A 1.2.3.22
-answer: www.movie.edu 86400 A 1.2.3.23
-answer: www.movie.edu 86400 A 1.2.3.24
-answer: www.movie.edu 86400 A 1.2.3.25
-answer: www.movie.edu 86400 A 1.2.3.26
-answer: www.movie.edu 86400 A 1.2.3.27
-answer: www.movie.edu 86400 A 1.2.3.28
-answer: www.movie.edu 86400 A 1.2.3.29
-answer: www.movie.edu 86400 A 1.2.3.30
-answer: www.movie.edu 86400 A 1.2.3.31
-answer: www.movie.edu 86400 A 1.2.3.32
-answer: www.movie.edu 86400 A 1.2.3.33
-answer: www.movie.edu 86400 A 1.2.3.34
-answer: www.movie.edu 86400 A 1.2.3.35
-answer: www.movie.edu 86400 A 1.2.3.36
-answer: www.movie.edu 86400 A 1.2.3.37
-answer: www.movie.edu 86400 A 1.2.3.38
-answer: www.movie.edu 86400 A 1.2.3.39
-0
 --- tinydns-data complains about unrecognized initial characters
 tinydns-data: fatal: unable to parse data line 3: unrecognized leading character
 111
@@ -242,12 +201,12 @@ tinydns-data: fatal: unable to create data.tmp: symbolic link loop
 --- tinydns-data produces A records
 1 wormhole.movie.edu:
 117 bytes, 1+2+2+1 records, response, authoritative, noerror
-query: 1 wormhole.movie.edu
+additional: a.ns.movie.edu 259200 A 192.249.249.3
 answer: wormhole.movie.edu 86400 A 192.249.249.1
 answer: wormhole.movie.edu 86400 A 192.253.253.1
 authority: movie.edu 259200 NS a.ns.movie.edu
 authority: movie.edu 259200 NS wormhole.movie.edu
-additional: a.ns.movie.edu 259200 A 192.249.249.3
+query: 1 wormhole.movie.edu
 0
 --- tinydns-data produces NS records
 2 movie.edu:
@@ -526,9 +485,9 @@ query: 255 test
 answer: test 98765 SOA primary.server host.master 1234567 2345678 3456789 4567890 5678901
 answer: test 37 NS ns.test
 answer: test 41 MX 0 mx.test
-answer: test 39 A 1.2.3.4
 answer: test 42 16 \004Text
 answer: test 43 12345 Binary
+answer: test 39 A 1.2.3.4
 additional: ns.test 37 A 1.2.3.4
 additional: mx.test 41 A 1.2.3.4
 0
@@ -809,11 +768,11 @@ answer: 127.43.123.234 655360 A 127.43.123.234
 0
 255 www.test:
 91 bytes, 1+2+1+1 records, response, authoritative, noerror
-query: 255 www.test
+additional: ns.test 259200 A 127.43.0.2
 answer: www.test 86400 A 127.43.0.100
 answer: www.test 86400 A 127.43.0.101
 authority: test 259200 NS ns.test
-additional: ns.test 259200 A 127.43.0.2
+query: 255 www.test
 0
 255 test:
 173 bytes, 1+4+0+3 records, response, authoritative, noerror
@@ -900,6 +859,102 @@ answer: 1.0.0.4.rbl.test 2048 16 \037See\040http://www.rbl.test/4.0.0.1
 34 bytes, 1+0+0+0 records, response, authoritative, nxdomain
 query: 255 0.0.0.4.rbl.test
 0
+--- tinydns handles differentiation
+
+0
+127.43.0.102 
+0
+
+127.43.0.100
+127.43.0.102
+0
+
+127.43.0.100
+127.43.0.102
+0
+255 pick.test5:
+81 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 pick.test5
+authority: test5 2560 SOA me.ns.test5 hostmaster.test5 987654321 16384 2048 1048576 2560
+0
+255 pick2.test5:
+81 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 pick2.test5
+answer: pick2.test5 86400 A 127.43.0.102
+authority: test5 259200 NS me.ns.test5
+additional: me.ns.test5 259200 A 127.43.0.2
+0
+255 pick3.test5:
+97 bytes, 1+2+1+1 records, response, authoritative, noerror
+additional: me.ns.test5 259200 A 127.43.0.2
+answer: pick3.test5 86400 A 127.43.0.100
+answer: pick3.test5 86400 A 127.43.0.102
+authority: test5 259200 NS me.ns.test5
+query: 255 pick3.test5
+0
+103 bytes, 1+2+1+1 records, response, authoritative, noerror
+255 really.wild.test5:
+additional: me.ns.test5 259200 A 127.43.0.2
+answer: really.wild.test5 86400 A 127.43.0.100
+answer: really.wild.test5 86400 A 127.43.0.102
+authority: test5 259200 NS me.ns.test5
+query: 255 really.wild.test5
+0
+--- tinydns-get handles differentiation
+255 pick.test5:
+80 bytes, 1+1+1+1 records, response, authoritative, noerror
+query: 255 pick.test5
+answer: pick.test5 86400 A 127.43.0.101
+authority: test5 259200 NS ex.ns.test5
+additional: ex.ns.test5 259200 A 127.43.0.2
+0
+255 pick2.test5:
+82 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 pick2.test5
+authority: test5 2560 SOA ex.ns.test5 hostmaster.test5 987654321 16384 2048 1048576 2560
+0
+255 pick3.test5:
+97 bytes, 1+2+1+1 records, response, authoritative, noerror
+additional: ex.ns.test5 259200 A 127.43.0.2
+answer: pick3.test5 86400 A 127.43.0.100
+answer: pick3.test5 86400 A 127.43.0.101
+authority: test5 259200 NS ex.ns.test5
+query: 255 pick3.test5
+0
+103 bytes, 1+2+1+1 records, response, authoritative, noerror
+255 really.wild.test5:
+additional: ex.ns.test5 259200 A 127.43.0.2
+answer: really.wild.test5 86400 A 127.43.0.100
+answer: really.wild.test5 86400 A 127.43.0.101
+authority: test5 259200 NS ex.ns.test5
+query: 255 really.wild.test5
+0
+255 pick.test5:
+81 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 pick.test5
+authority: test5 2560 SOA i4.ns.test5 hostmaster.test5 987654321 16384 2048 1048576 2560
+0
+255 pick2.test5:
+82 bytes, 1+0+1+0 records, response, authoritative, nxdomain
+query: 255 pick2.test5
+authority: test5 2560 SOA i4.ns.test5 hostmaster.test5 987654321 16384 2048 1048576 2560
+0
+255 pick3.test5:
+97 bytes, 1+2+1+1 records, response, authoritative, noerror
+additional: i4.ns.test5 259200 A 127.43.0.2
+answer: pick3.test5 86400 A 127.43.0.100
+answer: pick3.test5 86400 A 127.43.0.104
+authority: test5 259200 NS i4.ns.test5
+query: 255 pick3.test5
+0
+103 bytes, 1+2+1+1 records, response, authoritative, noerror
+255 really.wild.test5:
+additional: i4.ns.test5 259200 A 127.43.0.2
+answer: really.wild.test5 86400 A 127.43.0.100
+answer: really.wild.test5 86400 A 127.43.0.104
+authority: test5 259200 NS i4.ns.test5
+query: 255 really.wild.test5
+0
 --- pickdns works
 127.43.0.101 
 0
@@ -944,6 +999,44 @@ Ztest:ns.test.:hostmaster.test.:987654321:16384:2048:1048576:2560:2560
 &rbl.test::ns.rbl.test.:259200
 +ns.rbl.test:127.43.0.5:259200
 :big.test:16:\1770123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\1777890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123\1774567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\1771234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567\1778901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234\1775678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901\1772345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678o901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789:86400
+--- axfrdns handles differentiation
+0
+#987654321 auto axfr-get
+Ztest5:me.ns.test5.:hostmaster.test5.:987654321:16384:2048:1048576:2560:2560
+&test5::me.ns.test5.:259200
++me.ns.test5:127.43.0.2:259200
++pick2.test5:127.43.0.102:86400
++pick3.test5:127.43.0.100:86400
++pick3.test5:127.43.0.102:86400
++\052.wild.test5:127.43.0.100:86400
++\052.wild.test5:127.43.0.102:86400
+0
+#987654321 auto axfr-get
+Ztest5:i3.ns.test5.:hostmaster.test5.:987654321:16384:2048:1048576:2560:2560
+&test5::i3.ns.test5.:259200
++i3.ns.test5:127.43.0.2:259200
++pick3.test5:127.43.0.100:86400
++pick3.test5:127.43.0.103:86400
++\052.wild.test5:127.43.0.100:86400
++\052.wild.test5:127.43.0.103:86400
+0
+#987654321 auto axfr-get
+Ztest5:i4.ns.test5.:hostmaster.test5.:987654321:16384:2048:1048576:2560:2560
+&test5::i4.ns.test5.:259200
++i4.ns.test5:127.43.0.2:259200
++pick3.test5:127.43.0.100:86400
++pick3.test5:127.43.0.104:86400
++\052.wild.test5:127.43.0.100:86400
++\052.wild.test5:127.43.0.104:86400
+0
+#987654321 auto axfr-get
+Ztest5:i5.ns.test5.:hostmaster.test5.:987654321:16384:2048:1048576:2560:2560
+&test5::i5.ns.test5.:259200
++i5.ns.test5:127.43.0.2:259200
++pick3.test5:127.43.0.100:86400
++pick3.test5:127.43.0.105:86400
++\052.wild.test5:127.43.0.100:86400
++\052.wild.test5:127.43.0.105:86400
 --- axfrdns gives authoritative answers
 255 test4:
 727 bytes, 1+12+0+0 records, response, authoritative, noerror

@@ -175,12 +175,6 @@ void log_cachednxdomain(const char *dn)
   line();
 }
 
-void log_cachedservfail(const char *dn)
-{
-  string("cached servfail "); name(dn);
-  line();
-}
-
 void log_nxdomain(const char server[4],const char *q,unsigned int ttl)
 {
   string("nxdomain "); ip(server); space(); number(ttl); space();

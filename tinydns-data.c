@@ -53,6 +53,30 @@ void ttdparse(stralloc *sa,char ttd[8])
   }
 }
 
+void locparse(stralloc *sa,char loc[2])
+{
+  loc[0] = (sa->len > 0) ? sa->s[0] : 0;
+  loc[1] = (sa->len > 1) ? sa->s[1] : 0;
+}
+
+void ipprefix_cat(stralloc *out,char *s)
+{
+  unsigned long u;
+  char ch;
+  unsigned int j;
+
+  for (;;)
+    if (*s == '.')
+      ++s;
+    else {
+      j = scan_ulong(s,&u);
+      if (!j) return;
+      s += j;
+      ch = u;
+      if (!stralloc_catb(out,&ch,1)) nomem();
+    }
+}
+
 void txtparse(stralloc *sa)
 {
   char ch;
@@ -109,11 +133,16 @@ void rr_addname(const char *d)
 {
   rr_add(d,dns_domain_length(d));
 }
-void rr_start(const char type[2],unsigned long ttl,const char ttd[8])
+void rr_start(const char type[2],unsigned long ttl,const char ttd[8],const char loc[2])
 {
   char buf[4];
   if (!stralloc_copyb(&result,type,2)) nomem();
-  rr_add("=",1);
+  if (byte_equal(loc,2,"\0\0"))
+    rr_add("=",1);
+  else {
+    rr_add(">",1);
+    rr_add(loc,2);
+  }
   uint32_pack_big(buf,ttl);
   rr_add(buf,4);
   rr_add(ttd,8);
@@ -122,7 +151,7 @@ void rr_finish(const char *owner)
 {
   if (byte_equal(owner,2,"\1*")) {
     owner += 2;
-    result.s[2] = '*';
+    result.s[2] -= 19;
   }
   if (!stralloc_copyb(&key,owner,dns_domain_length(owner))) nomem();
   case_lowerb(key.s,key.len);
@@ -137,7 +166,7 @@ static stralloc line;
 int match = 1;
 unsigned long linenum = 0;
 
-#define NUMFIELDS 10
+#define NUMFIELDS 15
 static stralloc f[NUMFIELDS];
 
 static char *d1;
@@ -161,6 +190,7 @@ int main()
   char ch;
   unsigned long ttl;
   char ttd[8];
+  char loc[2];
   unsigned long u;
   char ip[4];
   char type[2];
@@ -192,6 +222,7 @@ int main()
     }
     if (!line.len) continue;
     if (line.s[0] == '#') continue;
+    if (line.s[0] == '-') continue;
 
     j = 1;
     for (i = 0;i < NUMFIELDS;++i) {
@@ -206,6 +237,15 @@ int main()
     }
 
     switch(line.s[0]) {
+
+      case '%':
+	locparse(&f[0],loc);
+	if (!stralloc_copyb(&key,"\0%",2)) nomem();
+	if (!stralloc_0(&f[1])) nomem();
+	ipprefix_cat(&key,f[1].s);
+        if (cdb_make_add(&cdb,key.s,key.len,loc,2) == -1)
+          die_datatmp();
+	break;
 
       case 'Z':
 	if (!dns_domain_fromdot(&d1,f[0].s,f[0].len)) nomem();
@@ -229,8 +269,9 @@ int main()
 	if (!stralloc_0(&f[8])) nomem();
 	if (!scan_ulong(f[8].s,&ttl)) ttl = TTL_NEGATIVE;
 	ttdparse(&f[9],ttd);
+	locparse(&f[10],loc);
 
-	rr_start(DNS_T_SOA,ttl,ttd);
+	rr_start(DNS_T_SOA,ttl,ttd,loc);
 	if (!dns_domain_fromdot(&d2,f[1].s,f[1].len)) nomem();
 	rr_addname(d2);
 	if (!dns_domain_fromdot(&d2,f[2].s,f[2].len)) nomem();
@@ -244,6 +285,7 @@ int main()
 	if (!stralloc_0(&f[3])) nomem();
 	if (!scan_ulong(f[3].s,&ttl)) ttl = TTL_NS;
 	ttdparse(&f[4],ttd);
+	locparse(&f[5],loc);
 
 	if (!stralloc_0(&f[1])) nomem();
 
@@ -254,7 +296,7 @@ int main()
 	if (!dns_domain_fromdot(&d2,f[2].s,f[2].len)) nomem();
 
 	if (line.s[0] == '.') {
-	  rr_start(DNS_T_SOA,ttl ? TTL_NEGATIVE : 0,ttd);
+	  rr_start(DNS_T_SOA,ttl ? TTL_NEGATIVE : 0,ttd,loc);
 	  rr_addname(d2);
 	  rr_add("\12hostmaster",11);
 	  rr_addname(d1);
@@ -262,12 +304,12 @@ int main()
 	  rr_finish(d1);
 	}
 
-	rr_start(DNS_T_NS,ttl,ttd);
+	rr_start(DNS_T_NS,ttl,ttd,loc);
 	rr_addname(d2);
 	rr_finish(d1);
 
 	if (ip4_scan(f[1].s,ip)) {
-	  rr_start(DNS_T_A,ttl,ttd);
+	  rr_start(DNS_T_A,ttl,ttd,loc);
 	  rr_add(ip,4);
 	  rr_finish(d2);
 	}
@@ -279,17 +321,18 @@ int main()
 	if (!stralloc_0(&f[2])) nomem();
 	if (!scan_ulong(f[2].s,&ttl)) ttl = TTL_POSITIVE;
 	ttdparse(&f[3],ttd);
+	locparse(&f[4],loc);
 
 	if (!stralloc_0(&f[1])) nomem();
 
 	if (ip4_scan(f[1].s,ip)) {
-	  rr_start(DNS_T_A,ttl,ttd);
+	  rr_start(DNS_T_A,ttl,ttd,loc);
 	  rr_add(ip,4);
 	  rr_finish(d1);
 
 	  if (line.s[0] == '=') {
 	    dns_name4_domain(dptr,ip);
-	    rr_start(DNS_T_PTR,ttl,ttd);
+	    rr_start(DNS_T_PTR,ttl,ttd,loc);
 	    rr_addname(d1);
 	    rr_finish(dptr);
 	  }
@@ -301,6 +344,7 @@ int main()
 	if (!stralloc_0(&f[4])) nomem();
 	if (!scan_ulong(f[4].s,&ttl)) ttl = TTL_POSITIVE;
 	ttdparse(&f[5],ttd);
+	locparse(&f[6],loc);
 
 	if (!stralloc_0(&f[1])) nomem();
 
@@ -313,14 +357,14 @@ int main()
 	if (!stralloc_0(&f[3])) nomem();
 	if (!scan_ulong(f[3].s,&u)) u = 0;
 
-	rr_start(DNS_T_MX,ttl,ttd);
+	rr_start(DNS_T_MX,ttl,ttd,loc);
 	uint16_pack_big(buf,u);
 	rr_add(buf,2);
 	rr_addname(d2);
 	rr_finish(d1);
 
 	if (ip4_scan(f[1].s,ip)) {
-	  rr_start(DNS_T_A,ttl,ttd);
+	  rr_start(DNS_T_A,ttl,ttd,loc);
 	  rr_add(ip,4);
 	  rr_finish(d2);
 	}
@@ -332,11 +376,12 @@ int main()
 	if (!stralloc_0(&f[2])) nomem();
 	if (!scan_ulong(f[2].s,&ttl)) ttl = TTL_POSITIVE;
 	ttdparse(&f[3],ttd);
+	locparse(&f[4],loc);
 
 	if (line.s[0] == 'C')
-	  rr_start(DNS_T_CNAME,ttl,ttd);
+	  rr_start(DNS_T_CNAME,ttl,ttd,loc);
 	else
-	  rr_start(DNS_T_PTR,ttl,ttd);
+	  rr_start(DNS_T_PTR,ttl,ttd,loc);
 	rr_addname(d2);
 	rr_finish(d1);
 	break;
@@ -346,8 +391,9 @@ int main()
 	if (!stralloc_0(&f[2])) nomem();
 	if (!scan_ulong(f[2].s,&ttl)) ttl = TTL_POSITIVE;
 	ttdparse(&f[3],ttd);
+	locparse(&f[4],loc);
 
-	rr_start(DNS_T_TXT,ttl,ttd);
+	rr_start(DNS_T_TXT,ttl,ttd,loc);
 
 	txtparse(&f[1]);
 	i = 0;
@@ -368,6 +414,7 @@ int main()
 	if (!stralloc_0(&f[3])) nomem();
 	if (!scan_ulong(f[3].s,&ttl)) ttl = TTL_POSITIVE;
 	ttdparse(&f[4],ttd);
+	locparse(&f[5],loc);
 
 	if (!stralloc_0(&f[1])) nomem();
 	scan_ulong(f[1].s,&u);
@@ -389,7 +436,7 @@ int main()
 
 	txtparse(&f[2]);
 
-	rr_start(type,ttl,ttd);
+	rr_start(type,ttl,ttd,loc);
 	rr_add(f[2].s,f[2].len);
 	rr_finish(d1);
 	break;

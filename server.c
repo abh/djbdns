@@ -45,7 +45,7 @@ static int doit(void)
   if (byte_equal(qclass,2,DNS_C_IN))
     response[2] |= 4;
   else
-    if (byte_diff(qclass,2,DNS_C_ANY)) goto NOQ;
+    if (byte_diff(qclass,2,DNS_C_ANY)) goto WEIRDCLASS;
   response[3] &= ~128;
   if (!(header[2] & 1)) response[2] &= ~1;
 
@@ -64,6 +64,13 @@ static int doit(void)
   response[3] &= ~15;
   response[3] |= 4;
   qlog(ip,port,header,q,qtype," I ");
+  return 1;
+
+  WEIRDCLASS:
+  response[3] &= ~15;
+  response[3] |= 1;
+  byte_copy(response + response_len - 2,2,qclass);
+  qlog(ip,port,header,q,qtype," C ");
   return 1;
 
   NOQ:

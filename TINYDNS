@@ -1,0 +1,25 @@
+The tinydns data.cdb format is subject to change. If you want to write
+code that relies on something here, let me know.
+
+Keys starting with the two bytes \000\045 are locations. The rest of the
+key is an IP prefix, normally between 0 and 4 bytes long. The data is a
+2-byte location.
+
+Other keys are owner names for DNS records. The data begins with a
+header in the following format:
+
+   * a 2-byte type;
+   * either \075, or \076 with a 2-byte location;
+   * a 4-byte TTL;
+   * an 8-byte timestamp.
+
+(Exception: Wildcard records replace \075 with \052 and \076 with \053;
+also, the owner name omits the wildcard.) The data continues in a
+type-specific format:
+
+   * SOA: first domain name, second domain name, 20-byte miscellany.
+   * NS or PTR or CNAME: domain name.
+   * MX: 2-byte preference, domain name.
+   * Other types: no special structure.
+
+Domain names, types, and numbers are in DNS packet format.

@@ -2,6 +2,7 @@
 # You are running as root.
 # You have dns{cache,log}, {tiny,pick,wall,axfr,rbl}dns accounts.
 # You have local IP addresses 127.43.0.{1,2,3,4,5}.
+# You are connected to the Internet.
 #
 # Some features not tested here:
 # dns_random works.
@@ -39,6 +40,7 @@ DNSCACHEIP=127.555.0.1; export DNSCACHEIP
 echo '--- dnscache-conf works'
 dnscache-conf dnscache dnslog $service/dnscache 127.555.0.1
 echo 127.555.0.2 > $service/dnscache/root/servers/tEST
+echo 127.555.0.2 > $service/dnscache/root/servers/tEST5
 echo 127.555.0.4 > $service/dnscache/root/servers/43.127.iN-aDDR.aRPA
 touch $service/dnscache/root/ip/127.43.0.1
 supervise $service/dnscache | supervise $service/dnscache/log &
@@ -182,49 +184,6 @@ echo $?
 
 
 echo '
-.movie.edu:1.2.3.4
-+www.movie.edu:1.2.3.5
-+www.movie.edu:1.2.3.6
-+www.movie.edu:1.2.3.7
-+www.movie.edu:1.2.3.8
-+www.movie.edu:1.2.3.9
-+www.movie.edu:1.2.3.10
-+www.movie.edu:1.2.3.11
-+www.movie.edu:1.2.3.12
-+www.movie.edu:1.2.3.13
-+www.movie.edu:1.2.3.14
-+www.movie.edu:1.2.3.15
-+www.movie.edu:1.2.3.16
-+www.movie.edu:1.2.3.17
-+www.movie.edu:1.2.3.18
-+www.movie.edu:1.2.3.19
-+www.movie.edu:1.2.3.20
-+www.movie.edu:1.2.3.21
-+www.movie.edu:1.2.3.22
-+www.movie.edu:1.2.3.23
-+www.movie.edu:1.2.3.24
-+www.movie.edu:1.2.3.25
-+www.movie.edu:1.2.3.26
-+www.movie.edu:1.2.3.27
-+www.movie.edu:1.2.3.28
-+www.movie.edu:1.2.3.29
-+www.movie.edu:1.2.3.30
-+www.movie.edu:1.2.3.31
-+www.movie.edu:1.2.3.32
-+www.movie.edu:1.2.3.33
-+www.movie.edu:1.2.3.34
-+www.movie.edu:1.2.3.35
-+www.movie.edu:1.2.3.36
-+www.movie.edu:1.2.3.37
-+www.movie.edu:1.2.3.38
-+www.movie.edu:1.2.3.39
-' > rts-tmp/data
-
-echo '--- tinydns-data does not complain about large packets'
-( cd rts-tmp; tinydns-data; echo $? )
-( cd rts-tmp; tinydns-get a www.movie.edu; echo $? )
-
-echo '
 =movie.edu:1.2.3.4
 *star
 ' > rts-tmp/data
@@ -286,7 +245,7 @@ echo '--- tinydns-data handles simple example'
 ( cd rts-tmp; tinydns-data; echo $? )
 
 echo '--- tinydns-data produces A records'
-( cd rts-tmp; tinydns-get 1 wormhole.movie.edu; echo $? )
+( cd rts-tmp; tinydns-get 1 wormhole.movie.edu | sort; echo $? )
 
 echo '--- tinydns-data produces NS records'
 ( cd rts-tmp; tinydns-get 2 movie.edu; echo $? )
@@ -551,6 +510,32 @@ C*.Www.Test2:Www.Test2:5000
 '\''Test4:801234567890123456789012345678901234567890123456789
 '\''Test4:901234567890123456789012345678901234567890123456789
 '\''Big.Test:0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+%i3:127.555.0.3
+%i4:127.555.0.4
+%i5:127.555.0.5
+%ME:127
+%EX
+.Test5:127.555.0.2:ex:::EX
+.Test5:127.555.0.2:me:::ME
+.Test5:127.555.0.2:i3:::i3
+.Test5:127.555.0.2:i4:::i4
+.Test5:127.555.0.2:i5:::i5
+-Pick.Test5:127.555.0.100:::EX
++Pick.Test5:127.555.0.101:::EX
+-Pick2.Test5:127.555.0.102:::ME
++Pick2.Test5:127.555.0.102:::ME
++Pick3.Test5:127.555.0.100
++Pick3.Test5:127.555.0.101:::EX
++Pick3.Test5:127.555.0.102:::ME
++Pick3.Test5:127.555.0.103:::i3
++Pick3.Test5:127.555.0.104:::i4
++Pick3.Test5:127.555.0.105:::i5
++*.Wild.Test5:127.555.0.100
++*.Wild.Test5:127.555.0.101:::EX
++*.Wild.Test5:127.555.0.102:::ME
++*.Wild.Test5:127.555.0.103:::i3
++*.Wild.Test5:127.555.0.104:::i4
++*.Wild.Test5:127.555.0.105:::i5
 ' > $service/tinydns/root/data
 utime $service/tinydns/root/data 987654321
 ( cd $service/tinydns/root; tinydns-data )
@@ -595,7 +580,7 @@ echo '
 ( cd $service/rbldns/root; rbldns-data )
 
 echo '
-127.:allow,AXFR="tEsT/TeSt2"
+127.:allow,AXFR="tEsT/TeSt2/TEst5"
 :deny
 ' > $service/axfrdns/tcp
 ( cd $service/axfrdns; tcprules tcp.cdb tcp.tmp < tcp )
@@ -610,7 +595,7 @@ dnsip WWW.TEST | tr ' ' '\012' | sort
 echo $?
 dnsmx TEST
 echo $?
-dnsq 255 WWW.TEST 127.555.0.2
+dnsq 255 WWW.TEST 127.555.0.2 | sort
 echo $?
 dnsq Any TEST 127.555.0.2
 echo $?
@@ -668,6 +653,36 @@ echo $?
 dnsq 255 0.0.0.4.rbl.test 127.555.0.5
 echo $?
 
+echo '--- tinydns handles differentiation'
+dnsip PICK.TEST5 
+echo $?
+dnsip PICK2.TEST5 
+echo $?
+dnsip PICK3.TEST5  | tr ' ' '\012' | sort
+echo $?
+dnsip REALLY.WILD.TEST5  | tr ' ' '\012' | sort
+echo $?
+dnsq 255 PICK.TEST5 127.555.0.2
+echo $?
+dnsq 255 PICK2.TEST5 127.555.0.2
+echo $?
+dnsq 255 PICK3.TEST5 127.555.0.2 | sort
+echo $?
+dnsq 255 REALLY.WILD.TEST5 127.555.0.2 | sort
+echo $?
+
+echo '--- tinydns-get handles differentiation'
+( cd rts-tmp/service/tinydns/root
+  tinydns-get 255 PICK.TEST5 1.2.3.4; echo $?
+  tinydns-get 255 PICK2.TEST5 1.2.3.4; echo $?
+  tinydns-get 255 PICK3.TEST5 1.2.3.4 | sort; echo $?
+  tinydns-get 255 REALLY.WILD.TEST5 1.2.3.4 | sort; echo $?
+  tinydns-get 255 PICK.TEST5 127.555.0.4; echo $?
+  tinydns-get 255 PICK2.TEST5 127.555.0.4; echo $?
+  tinydns-get 255 PICK3.TEST5 127.555.0.4 | sort; echo $?
+  tinydns-get 255 REALLY.WILD.TEST5 127.555.0.4 | sort; echo $?
+)
+
 echo '--- pickdns works'
 dnsip PICK.TEST
 echo $?
@@ -696,6 +711,23 @@ echo '--- axfrdns works'
 tcpclient -RHl0 127.43.0.2 53 axfr-get TEST rts-tmp/zone rts-tmp/zone.tmp
 echo $?
 cat rts-tmp/zone
+
+echo '--- axfrdns handles differentiation'
+tcpclient -RHl0 -i 127.43.0.2 127.43.0.2 53 axfr-get TEST5 rts-tmp/zone5 rts-tmp/zone5.tmp
+echo $?
+cat rts-tmp/zone5
+rm rts-tmp/zone5
+tcpclient -RHl0 -i 127.43.0.3 127.43.0.2 53 axfr-get TEST5 rts-tmp/zone5 rts-tmp/zone5.tmp
+echo $?
+cat rts-tmp/zone5
+rm rts-tmp/zone5
+tcpclient -RHl0 -i 127.43.0.4 127.43.0.2 53 axfr-get TEST5 rts-tmp/zone5 rts-tmp/zone5.tmp
+echo $?
+cat rts-tmp/zone5
+rm rts-tmp/zone5
+tcpclient -RHl0 -i 127.43.0.5 127.43.0.2 53 axfr-get TEST5 rts-tmp/zone5 rts-tmp/zone5.tmp
+echo $?
+cat rts-tmp/zone5
 
 echo '--- axfrdns gives authoritative answers'
 dnsq any Test4 127.43.0.2

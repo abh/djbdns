@@ -400,7 +400,7 @@ int main(int argc,char **argv)
 
   dns_random_init(seed);
 
-  if (!stralloc_copys(&querystr,"0:.:.::")) nomem();
+  if (!stralloc_copys(&querystr,"0:.:.:start:")) nomem();
 
   if (!address_alloc_readyplus(&address,1)) nomem();
   if (!query_alloc_readyplus(&query,1)) nomem();

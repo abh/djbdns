@@ -5,9 +5,8 @@ try to get the root authorities to set up a secure, usable NS-list system
 have dnscache-conf keep track of copies of dnsroots.global
 incorporate automatic NS-list upgrades
 
-consider merging pickdns and tinydns
+consider dead-server table in dnscache or in kernel
 
-consider dead-server table in dnscache
-
-IPv6 records
+IPv6 lookups
+maybe reverse IPv6 lookups; what a mess
 DNS over IPv6
