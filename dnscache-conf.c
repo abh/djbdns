@@ -11,6 +11,7 @@
 #include "taia.h"
 #include "str.h"
 #include "open.h"
+#include "error.h"
 #include "readwrite.h"
 #include "exit.h"
 #include "auto_home.h"
@@ -87,12 +88,15 @@ main(int argc,char **argv)
 
   if (chdir(auto_home) == -1)
     strerr_die4sys(111,FATAL,"unable to switch to ",auto_home,": ");
-  seed_addtime();
-  fdrootservers = open_read("etc/dnscache/@");
-  seed_addtime();
-  if (fdrootservers == -1)
-    strerr_die4sys(111,FATAL,"unable to open ",auto_home,"/etc/dnscache/@: ");
-  seed_addtime();
+
+  fdrootservers = open_read("/etc/dnsroots.local");
+  if (fdrootservers == -1) {
+    if (errno != error_noent)
+      strerr_die2sys(111,FATAL,"unable to open /etc/dnsroots.local: ");
+    fdrootservers = open_read("/etc/dnsroots.global");
+    if (fdrootservers == -1)
+      strerr_die2sys(111,FATAL,"unable to open /etc/dnsroots.global: ");
+  }
 
   init(dir,FATAL);
 
@@ -117,8 +121,8 @@ main(int argc,char **argv)
   seed_addtime(); start("env/DATALIMIT"); outs("3000000\n"); finish();
   seed_addtime(); perm(0644);
   seed_addtime(); start("run");
-  outs("#!/bin/sh\nexec 2>&1\nexec <seed\nexec envuidgid "); outs(user);
-  outs(" envdir ./env sh -c '\nexec softlimit -o250 -d \"$DATALIMIT\" ");
+  outs("#!/bin/sh\nexec 2>&1\nexec <seed\nexec envdir ./env sh -c '\n  exec envuidgid "); outs(user);
+  outs(" softlimit -o250 -d \"$DATALIMIT\" ");
   outs(auto_home); outs("/bin/dnscache\n'\n"); finish();
   seed_addtime(); perm(0755);
   seed_addtime(); start("log/run");

@@ -286,3 +286,13 @@
 	ui: dns_transmit_get() does not pause after most recv() errors.
 		still pauses after connection-refused when udploop is 2.
 	version: djbdns 1.01.
+20000922
+	portability problem: Linux distributions use bash as /bin/sh;
+		bash destroys $UID. dorks. impact: dnscache and axfrdns
+		run as root. fix: envdir, then sh, then envuidgid. but
+		/bin/sh really has to stop polluting the environment.
+20000923
+	ui: install /etc/dnsroots.global. dnscache-conf tries
+		dnsroots.local, then dnsroots.global.
+	ui: no longer install home/etc/dnscache.
+	version: djbdns 1.02.

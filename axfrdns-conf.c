@@ -48,8 +48,8 @@ main(int argc,char **argv)
   perm(0644);
 
   start("run");
-  outs("#!/bin/sh\nexec 2>&1\nexec envuidgid "); outs(user);
-  outs(" envdir ./env softlimit -d250000 sh -c '\nexec tcpserver -vDRHl0 -x tcp.cdb -- \"$IP\" 53 ");
+  outs("#!/bin/sh\nexec 2>&1\nexec envdir ./env sh -c '\n  exec envuidgid "); outs(user);
+  outs(" softlimit -d250000 tcpserver -vDRHl0 -x tcp.cdb -- \"$IP\" 53 ");
   outs(auto_home); outs("/bin/axfrdns\n'\n");
   finish();
   perm(0755);

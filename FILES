@@ -6,7 +6,7 @@ FILES
 SYSDEPS
 TARGETS
 Makefile
-@
+dnsroots.global
 conf-cc
 conf-ld
 conf-home
