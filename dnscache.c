@@ -381,7 +381,7 @@ static void doit(void)
 	t_new();
   }
 }
-  
+
 #define FATAL "dnscache: fatal: "
 
 char seed[128];

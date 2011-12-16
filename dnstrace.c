@@ -163,7 +163,7 @@ void query_add(const char *owner,const char type[2])
   if (!dns_domain_copy(&x.owner,owner)) nomem();
   byte_copy(x.type,2,type);
   if (!query_alloc_append(&query,&x)) nomem();
-  
+
   for (i = 0;i < ns.len;++i)
     if (dns_domain_suffix(owner,ns.s[i].owner))
       for (j = 0;j < address.len;++j)

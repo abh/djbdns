@@ -6,10 +6,10 @@ int getln2(buffer *ss,stralloc *sa,char **cont,unsigned int *clen,int sep)
   register char *x;
   register unsigned int i;
   int n;
- 
+
   if (!stralloc_ready(sa,0)) return -1;
   sa->len = 0;
- 
+
   for (;;) {
     n = buffer_feed(ss);
     if (n < 0) return -1;

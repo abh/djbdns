@@ -99,7 +99,7 @@ int main()
   droproot(fatal);
 
   initialize();
-  
+
   ndelay_off(udp53);
   socket_tryreservein(udp53,65536);
 

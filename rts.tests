@@ -654,9 +654,9 @@ dnsq 255 0.0.0.4.rbl.test 127.555.0.5
 echo $?
 
 echo '--- tinydns handles differentiation'
-dnsip PICK.TEST5 
+dnsip PICK.TEST5
 echo $?
-dnsip PICK2.TEST5 
+dnsip PICK2.TEST5
 echo $?
 dnsip PICK3.TEST5  | tr ' ' '\012' | sort
 echo $?

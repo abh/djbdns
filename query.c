@@ -490,7 +490,7 @@ static int doit(struct query *z,int state)
 	  cnamettl = ttlget(header + 4);
         }
       }
-  
+
     uint16_unpack_big(header + 8,&datalen);
     pos += datalen;
   }
@@ -745,7 +745,7 @@ static int doit(struct query *z,int state)
         if (byte_equal(header + 2,2,DNS_C_IN)) /* should always be true */
           if (typematch(header,dtype)) {
             if (!response_rstart(t1,header,ttl)) goto DIE;
-  
+
             if (typematch(header,DNS_T_NS) || typematch(header,DNS_T_CNAME) || typematch(header,DNS_T_PTR)) {
               if (!dns_packet_getname(buf,len,pos,&t2)) goto DIE;
               if (!response_addname(t2)) goto DIE;
@@ -768,7 +768,7 @@ static int doit(struct query *z,int state)
               if (pos + datalen > len) goto DIE;
               if (!response_addbytes(buf + pos,datalen)) goto DIE;
             }
-  
+
             response_rfinish(RESPONSE_ANSWER);
           }
 
