@@ -326,7 +326,7 @@ int main()
   dns_random_init(seed);
 
   axfr = env_get("AXFR");
-  
+
   x = env_get("TCPREMOTEIP");
   if (x && ip4_scan(x,ip))
     ;

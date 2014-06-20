@@ -17,7 +17,7 @@ ENOMEM;
 -2;
 #endif
 
-int error_noent = 
+int error_noent =
 #ifdef ENOENT
 ENOENT;
 #else

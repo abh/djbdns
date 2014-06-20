@@ -91,7 +91,7 @@ int main(int argc,char **argv)
   if (!x) nomem();
   byte_zero(x,xmax * sizeof(struct line));
 
-  io = (iopause_fd *) alloc((xmax + 1) * sizeof(iopause_fd)); 
+  io = (iopause_fd *) alloc((xmax + 1) * sizeof(iopause_fd));
   if (!io) nomem();
 
   if (!stralloc_copys(&partial,"")) nomem();
@@ -128,7 +128,7 @@ int main(int argc,char **argv)
 	  else
 	    inbuflen += r;
         }
-    
+
     for (i = 0;i < xnum;++i)
       if (x[i].flagactive) {
 	r = dns_transmit_get(&x[i].dt,x[i].io,&stamp);
@@ -174,17 +174,17 @@ int main(int argc,char **argv)
 	  if (!stralloc_catb(&partial,inbuf,i)) nomem();
 	  inbuflen -= i;
 	  for (j = 0;j < inbuflen;++j) inbuf[j] = inbuf[j + i];
-  
+
 	  if (partial.len) {
 	    i = byte_chr(partial.s,partial.len,'\n');
 	    i = byte_chr(partial.s,i,'\t');
 	    i = byte_chr(partial.s,i,' ');
-    
+
 	    if (!stralloc_copyb(&x[xnum].left,partial.s,i)) nomem();
 	    if (!stralloc_copys(&x[xnum].middle,"")) nomem();
 	    if (!stralloc_copyb(&x[xnum].right,partial.s + i,partial.len - i)) nomem();
 	    x[xnum].flagactive = 0;
-  
+
 	    partial.len = i;
 	    if (!stralloc_0(&partial)) nomem();
 	    if (ip4_scan(partial.s,ip)) {
@@ -200,7 +200,7 @@ int main(int argc,char **argv)
 	    }
 	    ++xnum;
 	  }
-  
+
 	  partial.len = 0;
 	  continue;
 	}

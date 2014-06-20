@@ -151,7 +151,7 @@ void cache_set(const char *key,unsigned int keylen,const char *data,unsigned int
 
     pos = get4(oldest);
     set4(pos,get4(pos) ^ oldest);
-  
+
     oldest += get4(oldest + 4) + get4(oldest + 8) + 20;
     if (oldest > unused) cache_impossible();
     if (oldest == unused) {

@@ -130,7 +130,7 @@ vijf
 9
 0
 --- dnsip finds IP address of network-surveys.cr.yp.to
-131.193.178.100 
+131.193.178.100
 0
 --- dnsip does not find nonexistent.cr.yp.to
 
@@ -139,24 +139,24 @@ vijf
 dnsip: fatal: unable to find IP address for x.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789.0123456789: protocol error
 111
 --- dnsip handles IP address on input
-1.2.3.4 
-127.0.0.1 
-10.43.166.133 
-10.43.166.133 
+1.2.3.4
+127.0.0.1
+10.43.166.133
+10.43.166.133
 0
 --- dnsip allows 0 to be omitted
-127.0.0.1 
+127.0.0.1
 0
 --- dnsip handles multiple IP addresses on input
-1.2.3.4 5.6.7.8 9.10.11.12 13.14.15.16 
+1.2.3.4 5.6.7.8 9.10.11.12 13.14.15.16
 0
 --- dnsipq handles simple examples
-1.2.3.4 1.2.3.4 
-localhost 127.0.0.1 
-localhost 127.0.0.1 
-5.6.7.8 5.6.7.8 
-network-surveys.cr.yp.to 131.193.178.100 
-nonexistent.whatever.cr.yp.to 
+1.2.3.4 1.2.3.4
+localhost 127.0.0.1
+localhost 127.0.0.1
+5.6.7.8 5.6.7.8
+network-surveys.cr.yp.to 131.193.178.100
+nonexistent.whatever.cr.yp.to
 0
 --- dnsmx finds MX record for network-surveys.cr.yp.to
 0 a.mx.network-surveys.cr.yp.to
@@ -792,7 +792,7 @@ additional: b.mx.test 86400 A 127.43.0.101
 0
 234.123.43.127.in-addr.arpa
 0
-127.43.123.234 
+127.43.123.234
 0
 255 234.123.43.127.in-addr.arpa:
 75 bytes, 1+2+0+0 records, response, authoritative, noerror
@@ -811,7 +811,7 @@ answer: 127.43.123.234 655360 A 127.43.123.234
 temporary failure
 0
 --- rbldns works
-127.0.0.3 
+127.0.0.3
 0
 See http://www.rbl.test/5.4.3.2
 0
@@ -821,7 +821,7 @@ query: 255 2.3.4.5.rbl.test
 answer: 2.3.4.5.rbl.test 2048 A 127.0.0.3
 answer: 2.3.4.5.rbl.test 2048 16 \037See\040http://www.rbl.test/5.4.3.2
 0
-127.0.0.3 
+127.0.0.3
 0
 See http://www.rbl.test/4.1.255.200
 0
@@ -831,7 +831,7 @@ query: 255 200.255.1.4.rbl.test
 answer: 200.255.1.4.rbl.test 2048 A 127.0.0.3
 answer: 200.255.1.4.rbl.test 2048 16 #See\040http://www.rbl.test/4.1.255.200
 0
-127.0.0.3 
+127.0.0.3
 0
 See http://www.rbl.test/4.0.255.200
 0
@@ -841,7 +841,7 @@ query: 255 200.255.0.4.rbl.test
 answer: 200.255.0.4.rbl.test 2048 A 127.0.0.3
 answer: 200.255.0.4.rbl.test 2048 16 #See\040http://www.rbl.test/4.0.255.200
 0
-127.0.0.3 
+127.0.0.3
 0
 See http://www.rbl.test/4.0.0.1
 0
@@ -862,7 +862,7 @@ query: 255 0.0.0.4.rbl.test
 --- tinydns handles differentiation
 
 0
-127.43.0.102 
+127.43.0.102
 0
 
 127.43.0.100
@@ -956,9 +956,9 @@ authority: test5 259200 NS i4.ns.test5
 query: 255 really.wild.test5
 0
 --- pickdns works
-127.43.0.101 
+127.43.0.101
 0
-127.43.0.102 
+127.43.0.102
 0
 255 pick.test:
 43 bytes, 1+1+0+0 records, response, authoritative, noerror
